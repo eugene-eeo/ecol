@@ -2,11 +2,12 @@ import random
 import string
 import networkx as nx
 import graphviz
+from itertools import cycle
 
 
 def random_bipartite_graph():
-    A = random.sample(string.ascii_lowercase, random.randint(5, 10))
-    B = random.sample(string.ascii_uppercase, random.randint(5, 10))
+    A = random.sample(string.ascii_lowercase, random.randint(2, 10))
+    B = random.sample(string.ascii_uppercase, random.randint(2, 10))
     G = nx.Graph()
     G.add_nodes_from(A)
     G.add_nodes_from(B)
@@ -18,6 +19,8 @@ def random_bipartite_graph():
 
 def plot_graph(G: nx.Graph):
     dot = graphviz.Graph()
+    dot.graph_attr['rankdir'] = 'LR'
+    dot.graph_attr['ratio'] = '0.95'
     for node in G.nodes():
         dot.node(node, node)
     for u, v in G.edges():
@@ -30,20 +33,23 @@ def max_degree(G: nx.Graph):
 
 
 def free_colours(edges, colours):
+    """
+    Usage: free_colours(G[u], colours)
+    """
     used = set(x['colour'] for _, x in edges.items() if 'colour' in x)
     return colours - used
 
 
-def find_edge_with_colour(G, u, colour):
+def find_edge_with_colour(G, u, colour, exclude=()):
     for v in G[u]:
-        if G.edges[u, v]['colour'] == colour:
+        if v not in exclude and G.edges[u, v].get('colour') == colour:
             return u, v
 
 
 def flip(G, start, alpha, beta):
     """
     Flips the edge colours along the path P starting on `start`
-    in the graph G[`alpha`, `beta`]. E.g.:
+    in the graph G[`alpha`,`beta`]. E.g.:
 
             α      β      α      β
         v1 --> v2 --> v3 --> v4 --> v5
@@ -55,16 +61,16 @@ def flip(G, start, alpha, beta):
 
     """
     u = start
-    colour = alpha
-    while True:
-        edge = find_edge_with_colour(G, u, colour)
+    s = {u}
+    for to_find, to_replace in cycle([(alpha, beta), (beta, alpha)]):
+        edge = find_edge_with_colour(G, u, to_find, s)
         if edge is None:
             break
-        G.edges[edge]['colour'] = beta if colour == alpha else alpha
-        u, _ = edge
+        G.edges[edge]['colour'] = to_replace
+        _, u = edge
         if u == start:
             break
-        colour = beta if colour == alpha else alpha
+        s.add(u)
 
 
 def edge_colour_bipartite(G: nx.Graph):

@@ -6,8 +6,8 @@ from itertools import cycle
 
 
 def random_bipartite_graph():
-    A = random.sample(string.ascii_lowercase, random.randint(2, 10))
-    B = random.sample(string.ascii_uppercase, random.randint(2, 10))
+    A = random.sample(string.ascii_lowercase, random.randint(2, 23))
+    B = random.sample(string.ascii_uppercase, random.randint(2, 23))
     G = nx.Graph()
     G.add_nodes_from(A)
     G.add_nodes_from(B)
@@ -40,9 +40,9 @@ def free_colours(edges, colours):
     return colours - used
 
 
-def find_edge_with_colour(G, u, colour, exclude=()):
+def find_edge_with_colour(G, u, colour, prev=None):
     for v in G[u]:
-        if v not in exclude and G.edges[u, v].get('colour') == colour:
+        if G.edges[u, v].get('colour') == colour and v != prev:
             return u, v
 
 
@@ -60,17 +60,18 @@ def flip(G, start, alpha, beta):
         v1 --> v2 --> v3 --> v4 --> v5
 
     """
+    prev = None
     u = start
-    s = {u}
     for to_find, to_replace in cycle([(alpha, beta), (beta, alpha)]):
-        edge = find_edge_with_colour(G, u, to_find, s)
+        edge = find_edge_with_colour(G, u, to_find, prev)
+        prev = u
         if edge is None:
             break
+
         G.edges[edge]['colour'] = to_replace
         _, u = edge
         if u == start:
             break
-        s.add(u)
 
 
 def edge_colour_bipartite(G: nx.Graph):

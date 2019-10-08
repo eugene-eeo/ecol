@@ -34,10 +34,10 @@ def free_colours(edges, colours):
     return colours - used
 
 
-def find_edge_with_colour(G, node, colour):
-    for v in G[node]:
-        if G[node, v]['colour'] == colour:
-            return node, v
+def find_edge_with_colour(G, u, colour):
+    for v in G[u]:
+        if G.edges[u, v]['colour'] == colour:
+            return u, v
 
 
 def flip(G, start, alpha, beta):
@@ -57,9 +57,11 @@ def flip(G, start, alpha, beta):
     u = start
     colour = alpha
     while True:
-        u, v = find_edge_with_colour(G, u, colour)
-        G[u, v]['colour'] = beta if colour == alpha else alpha
-        u = v
+        edge = find_edge_with_colour(G, u, colour)
+        if edge is None:
+            break
+        G.edges[edge]['colour'] = beta if colour == alpha else alpha
+        u, _ = edge
         if u == start:
             break
         colour = beta if colour == alpha else alpha
@@ -81,3 +83,11 @@ def edge_colour_bipartite(G: nx.Graph):
         beta = v_free.pop()
         flip(G, u, beta, alpha)
         G.edges[u, v]['colour'] = beta
+
+
+def validate_colouring(G: nx.Graph):
+    for u in G.nodes:
+        x = {data['colour'] for data in G[u].values()}
+        if len(x) != G.degree[u]:
+            return False
+    return True

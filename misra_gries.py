@@ -39,10 +39,7 @@ def misra_gries(G: nx.Graph):
         d = free_colours(G[F[-1]], colours).pop()
         flip_path_containing(G, X, c, d)
 
-        w = None
-        for x in F:
-            if d in free_colours(G[x], colours):
-                w = x
+        for w in F:
+            if d in free_colours(G[w], colours):
+                rotate(G, X, F[:F.index(w)+1], d)
                 break
-        if w is not None:
-            rotate(G, X, F[:F.index(w)+1], d)

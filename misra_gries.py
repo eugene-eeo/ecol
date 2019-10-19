@@ -8,6 +8,23 @@ def rotate(G, v, W, colour):
     G.edges[v, W[-1]]['colour'] = colour
 
 
+def maximal_fan(G, X, Y, colours):
+    F = [Y]
+    S = {Y}
+    found = True
+    while found:
+        found = False
+        for v in G[X]:
+            if (v not in S and
+                    G.edges[X, v]['colour'] in
+                    free_colours(G[F[-1]], colours)):
+                F.append(v)
+                S.add(v)
+                found = True
+                break
+    return F
+
+
 def misra_gries(G: nx.Graph):
     # see http://www.cs.utexas.edu/users/misra/psp.dir/vizing.pdf
     colours = set(range(1, max_degree(G) + 2))  # Delta+1 colours
@@ -21,19 +38,7 @@ def misra_gries(G: nx.Graph):
             continue
 
         # construct a maximal fan:
-        F = [Y]
-        S = set(F)
-        found = True
-        while found:
-            found = False
-            for v in G[X]:
-                if (v not in S and
-                        G.edges[X, v]['colour'] in
-                        free_colours(G[F[-1]], colours)):
-                    F.append(v)
-                    S.add(v)
-                    found = True
-                    break
+        F = maximal_fan(G, X, Y, colours)
 
         c = X_free.pop()
         d = free_colours(G[F[-1]], colours).pop()

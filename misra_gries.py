@@ -1,11 +1,5 @@
 import networkx as nx
-from bipartite import free_colours, max_degree, find_edge_with_colour, \
-    flip_path_containing
-
-
-def endpoint_with_colour(G, u, colour):
-    _, v = find_edge_with_colour(G, u, colour)
-    return v
+from bipartite import free_colours, max_degree, flip_path_containing
 
 
 def rotate(G, v, W, colour):
@@ -17,7 +11,6 @@ def rotate(G, v, W, colour):
 def misra_gries(G: nx.Graph):
     # see http://www.cs.utexas.edu/users/misra/psp.dir/vizing.pdf
     colours = set(range(1, max_degree(G) + 2))  # Delta+1 colours
-    print(colours)
     for X, Y in G.edges:
         X_free = free_colours(G[X], colours)
         Y_free = free_colours(G[Y], colours)
@@ -35,8 +28,7 @@ def misra_gries(G: nx.Graph):
             found = False
             for v in G[X]:
                 if (v not in S and
-                        G.edges[X, v].get('colour') is not None and
-                        G.edges[X, v]['colour'] in
+                        G.edges[X, v].get('colour') in
                         free_colours(G[F[-1]], colours)):
                     F.append(v)
                     S.add(v)

@@ -32,31 +32,12 @@ def max_degree(G: nx.Graph):
     return max(n for _, n in G.degree())
 
 
-def used_colours(edges):
-    """
-    Usage: used_colours(G[u])
-    """
-    return set(x['colour'] for _, x in edges.items() if 'colour' in x)
-
-
 def free_colours(edges, colours):
     """
     Usage: free_colours(G[u], colours)
     """
-    return colours - used_colours(edges)
-
-
-def coloured_component_endpoint(G, start, alpha, beta):
-    u = start
-    prev = u
-    for to_find in cycle([alpha, beta]):
-        edge = find_edge_with_colour(G, u, to_find, prev)
-        if edge is None:
-            return prev
-        prev = u
-        _, u = edge
-        if u != start:
-            break
+    used = set(x['colour'] for _, x in edges.items() if 'colour' in x)
+    return colours - used
 
 
 def flip_path_containing(G, v, alpha, beta):

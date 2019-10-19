@@ -28,7 +28,7 @@ def misra_gries(G: nx.Graph):
             found = False
             for v in G[X]:
                 if (v not in S and
-                        G.edges[X, v].get('colour') in
+                        G.edges[X, v]['colour'] in
                         free_colours(G[F[-1]], colours)):
                     F.append(v)
                     S.add(v)

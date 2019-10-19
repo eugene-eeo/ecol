@@ -24,8 +24,14 @@ def plot_graph(G: nx.Graph):
     for node in G.nodes():
         dot.node(str(node), str(node))
     for u, v in G.edges():
-        dot.edge(str(u), str(v), label=str(G.edges[u, v].get('colour', '0')))
+        dot.edge(str(u), str(v), label=str(G.edges[u, v]['colour']))
     return dot
+
+
+def prep(G: nx.Graph):
+    for u, v in G.edges:
+        G.edges[u, v]['colour'] = None
+    return G
 
 
 def max_degree(G: nx.Graph):
@@ -36,7 +42,7 @@ def free_colours(edges, colours):
     """
     Usage: free_colours(G[u], colours)
     """
-    used = set(x['colour'] for _, x in edges.items() if 'colour' in x)
+    used = set(x['colour'] for _, x in edges.items())
     return colours - used
 
 
@@ -65,7 +71,7 @@ def flip_path_containing(G, v, alpha, beta):
 
 def find_edge_with_colour(G, u, colour, prev=None):
     for v in G[u]:
-        if G.edges[u, v].get('colour') == colour and v != prev:
+        if G.edges[u, v]['colour'] == colour and v != prev:
             return u, v
 
 

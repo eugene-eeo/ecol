@@ -22,9 +22,9 @@ def plot_graph(G: nx.Graph):
     dot.graph_attr['rankdir'] = 'LR'
     dot.graph_attr['ratio'] = '0.95'
     for node in G.nodes():
-        dot.node(node, node)
+        dot.node(str(node), str(node))
     for u, v in G.edges():
-        dot.edge(u, v, label=str(G.edges[u, v].get('colour', '0')))
+        dot.edge(str(u), str(v), label=str(G.edges[u, v].get('colour', '0')))
     return dot
 
 
@@ -32,12 +32,54 @@ def max_degree(G: nx.Graph):
     return max(n for _, n in G.degree())
 
 
+def used_colours(edges):
+    """
+    Usage: used_colours(G[u])
+    """
+    return set(x['colour'] for _, x in edges.items() if 'colour' in x)
+
+
 def free_colours(edges, colours):
     """
     Usage: free_colours(G[u], colours)
     """
-    used = set(x['colour'] for _, x in edges.items() if 'colour' in x)
-    return colours - used
+    return colours - used_colours(edges)
+
+
+def coloured_component_endpoint(G, start, alpha, beta):
+    u = start
+    prev = u
+    for to_find in cycle([alpha, beta]):
+        edge = find_edge_with_colour(G, u, to_find, prev)
+        if edge is None:
+            return prev
+        prev = u
+        _, u = edge
+        if u != start:
+            break
+
+
+def flip_path_containing(G, v, alpha, beta):
+    """
+    Flips the edge colours along the path P containing `v`
+    in the graph G[`alpha`,`beta`]. E.g.:
+
+             β     α      β      α
+        u-1 --> v --> u1 --> u2 --> ...
+
+    """
+    #      α     β     α     β
+    # ... --> y --> v --> x --> ...
+    e = find_edge_with_colour(G, v, alpha)
+    f = find_edge_with_colour(G, v, beta)
+    if e:
+        _, x = e
+        flip(G, x, beta, alpha)
+        G.edges[e]['colour'] = beta
+    if f:
+        _, y = f
+        flip(G, y, alpha, beta)
+        G.edges[f]['colour'] = alpha
 
 
 def find_edge_with_colour(G, u, colour, prev=None):
@@ -96,5 +138,6 @@ def validate_colouring(G: nx.Graph):
     for u in G.nodes:
         x = {data['colour'] for data in G[u].values()}
         if len(x) != G.degree[u]:
+            print(u)
             return False
     return True

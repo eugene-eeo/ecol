@@ -1,0 +1,1312 @@
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date true
+\justification true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Literature Review
+\end_layout
+
+\begin_layout Author
+Eeo Jun
+\end_layout
+
+\begin_layout Section
+Introduction & Definitions
+\end_layout
+
+\begin_layout Standard
+Our project would be to implement an algorithm for edge colouring, and analyse
+ how the output changes for different kinds of graphs - in particular random
+ graphs.
+ An extended goal would be to analyse colouring for graphs which have a
+ small number of vertices with maximum degree.
+ Some of the many applications of edge colouring are round-robin tournament
+ scheduling
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-7"
+
+\end_inset
+
+, as well as link scheduling for TDMA network protocols.
+\end_layout
+
+\begin_layout Standard
+An example of the link scheduling problem is as follows; we have 4 devices
+ which are linked to some number of other devices.
+ They want to communicate with one another, but if two devices communicate
+ with the same one at the same time, their signals will interfere with one
+ another.
+ One solution to this is to allow communication between different pairs
+ of devices every time period 
+\begin_inset Formula $t$
+\end_inset
+
+, in such a way so two devices won't communicate with the same device in
+ the same time period; after 
+\begin_inset Formula $k$
+\end_inset
+
+ of these periods, all devices would have communicated to one another.
+\end_layout
+
+\begin_layout Standard
+If we represent this as a graph, with the vertices being the devices and
+ the edges being 
+\begin_inset Formula $\{uv:\text{{u\,can\,communicate\,with\,v\}}}$
+\end_inset
+
+, then the problem of minimising 
+\begin_inset Formula $k$
+\end_inset
+
+ is the same as that of computing the chromatic index of this graph.
+\end_layout
+
+\begin_layout Standard
+We take definitions from Diestel
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-1"
+
+\end_inset
+
+ - a 
+\series bold
+graph
+\series default
+ is a pair 
+\begin_inset Formula $G=(V,E)$
+\end_inset
+
+ of vertices and edges, where 
+\begin_inset Formula $E\subseteq V^{2}$
+\end_inset
+
+.
+ In our study we only consider cases where 
+\begin_inset Formula $|V|$
+\end_inset
+
+ and 
+\begin_inset Formula $|E|$
+\end_inset
+
+ are finite.
+ The 
+\series bold
+degree
+\series default
+ of a vertex 
+\begin_inset Formula $v$
+\end_inset
+
+, 
+\begin_inset Formula $d(v)$
+\end_inset
+
+ is the number of edges at 
+\begin_inset Formula $v$
+\end_inset
+
+.
+ The 
+\series bold
+maximum degree
+\series default
+ of a graph 
+\begin_inset Formula $G$
+\end_inset
+
+, 
+\begin_inset Formula $\Delta(G)$
+\end_inset
+
+ (or 
+\begin_inset Formula $\Delta$
+\end_inset
+
+ where there is no ambiguity) is the maximum value of 
+\begin_inset Formula $d(v)$
+\end_inset
+
+ over all vertices of 
+\begin_inset Formula $G$
+\end_inset
+
+.
+ An 
+\series bold
+edge colouring
+\series default
+ of some graph 
+\begin_inset Formula $G=(V,E)$
+\end_inset
+
+ is a mapping 
+\begin_inset Formula $\varphi:E\rightarrow\mathcal{C}$
+\end_inset
+
+ where 
+\begin_inset Formula $\mathcal{C}$
+\end_inset
+
+ is a set of colours, such that for all pairs of distinct edges 
+\begin_inset Formula $e,f\in E$
+\end_inset
+
+, if 
+\begin_inset Formula $e$
+\end_inset
+
+ and 
+\begin_inset Formula $f$
+\end_inset
+
+ share a common vertex then 
+\begin_inset Formula $\varphi(e)\neq\varphi(f)$
+\end_inset
+
+.
+ The 
+\series bold
+chromatic index
+\series default
+ of a graph, 
+\begin_inset Formula $\chi'(G)$
+\end_inset
+
+ is the minimum number of colours required for a valid edge colouring of
+ 
+\begin_inset Formula $G$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+A 
+\series bold
+Class 1 
+\series default
+graph has a chromatic index of 
+\begin_inset Formula $\chi'=\Delta$
+\end_inset
+
+, and a 
+\series bold
+Class 2 
+\series default
+graph has a chromatic index of 
+\begin_inset Formula $\chi'=\Delta+1$
+\end_inset
+
+.
+ If 
+\begin_inset Formula $Z\subseteq V$
+\end_inset
+
+ is a set of nodes, then the 
+\series bold
+induced subgraph
+\series default
+ 
+\begin_inset Formula $(Z,\{uv\in E(G)\,|\,u,v\in Z\})$
+\end_inset
+
+ is denoted by 
+\begin_inset Formula $G[Z]$
+\end_inset
+
+.
+ The set of vertices of 
+\begin_inset Formula $G$
+\end_inset
+
+ which have degree 
+\begin_inset Formula $\Delta$
+\end_inset
+
+ is denoted by 
+\begin_inset Formula $\Lambda_{G}$
+\end_inset
+
+.
+ The 
+\series bold
+core
+\series default
+ and 
+\series bold
+semi-core
+\series default
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-2"
+
+\end_inset
+
+ of a graph 
+\begin_inset Formula $G$
+\end_inset
+
+ is denoted by 
+\begin_inset Formula $G[\Lambda_{G}]$
+\end_inset
+
+, and 
+\begin_inset Formula $G[N_{G}(\Lambda_{G}))]$
+\end_inset
+
+, respectively, where 
+\begin_inset Formula $N_{G}(Z)=\{v:uv\in E(G),\,u\in Z\}\,\cup\,Z$
+\end_inset
+
+; i.e.
+ the subgraph induced by the verticles of maximum degree and their neighbours.
+\end_layout
+
+\begin_layout Standard
+A graph is 
+\series bold
+complete
+\series default
+ if 
+\begin_inset Formula $\forall u,v\in V,\,u\neq v,\,uv\in E$
+\end_inset
+
+.
+ A complete graph with 
+\begin_inset Formula $n$
+\end_inset
+
+ nodes is denoted 
+\begin_inset Formula $K_{n}$
+\end_inset
+
+.
+ A 
+\series bold
+bipartite graph
+\series default
+ is a graph 
+\begin_inset Formula $G=(V,E)$
+\end_inset
+
+ such that 
+\begin_inset Formula $V$
+\end_inset
+
+ can be partitioned into two sets, 
+\begin_inset Formula $A$
+\end_inset
+
+ and 
+\begin_inset Formula $B$
+\end_inset
+
+ such that 
+\begin_inset Formula $A\cap B=\emptyset$
+\end_inset
+
+, and there is no edge 
+\begin_inset Formula $uv$
+\end_inset
+
+ in 
+\begin_inset Formula $E$
+\end_inset
+
+ such that 
+\begin_inset Formula $u,v\in A$
+\end_inset
+
+ or 
+\begin_inset Formula $u,v\in B$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Section
+Theorems
+\end_layout
+
+\begin_layout Standard
+The foundation of edge colouring is Vizing's Theorem
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-4"
+
+\end_inset
+
+, which establishes a tight lower and upper bound on the chromatic index
+ of any (simple) graph.
+ Vizing's Theorem states that 
+\begin_inset Formula $\forall G,\,\Delta(G)\leq\chi'(G)\leq\Delta(G)+1$
+\end_inset
+
+.
+ As mentioned previously, graphs which only need 
+\begin_inset Formula $\Delta$
+\end_inset
+
+ colours are in Class 1, and those that need 
+\begin_inset Formula $\Delta+1$
+\end_inset
+
+ in Class 2.
+ It was shown that determining whether a graph is in Class 1 or Class 2
+ is NP-Complete
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-5"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Some graph classes do have polynomial time algorithms to compute a proper
+ and optimal edge colouring (and by extension, determine if the graph is
+ in Class 1/2).
+ For instance, Behzad et al
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-6"
+
+\end_inset
+
+ used a simple construction with addition of edges modulo 
+\begin_inset Formula $n$
+\end_inset
+
+ to show that the chromatic index for 
+\begin_inset Formula $K_{n}$
+\end_inset
+
+ is 
+\begin_inset Formula $n-1$
+\end_inset
+
+ if 
+\begin_inset Formula $n$
+\end_inset
+
+ is even, and 
+\begin_inset Formula $n$
+\end_inset
+
+ if 
+\begin_inset Formula $n$
+\end_inset
+
+ is odd and 
+\begin_inset Formula $n\geq3$
+\end_inset
+
+ (the case where 
+\begin_inset Formula $n=1$
+\end_inset
+
+ is trivial).
+ For bipartite graphs, there is Kőnig's Theorem
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-3"
+
+\end_inset
+
+: 
+\emph on
+The chromatic index of any bipartite graph is equal to its maximum degree;
+ 
+\emph default
+i.e.
+ every bipartite graph is Class 1.
+\end_layout
+
+\begin_layout Standard
+In proofs of both Konig's and Vizing's theorem, a common technique used
+ is the path switching method.
+ It is used when an edge cannot be coloured using one of the free colours
+ of its endpoints.
+ (The 
+\emph on
+free
+\emph default
+ colours at some node 
+\begin_inset Formula $u$
+\end_inset
+
+ refer to the set 
+\begin_inset Formula $\mathcal{C\,}\backslash\,\{\gamma:uv\in E(G),\,\varphi(uv)=\gamma\}$
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+Given two colours 
+\begin_inset Formula $\alpha,\beta\in\mathcal{C}$
+\end_inset
+
+ (
+\begin_inset Formula $\mathcal{C}$
+\end_inset
+
+ being the set of colours), we use 
+\begin_inset Formula $G_{\varphi}[\alpha,\beta]$
+\end_inset
+
+ to denote the subgraph of 
+\begin_inset Formula $G$
+\end_inset
+
+ induced by only the edges which have been coloured 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ and 
+\begin_inset Formula $\beta$
+\end_inset
+
+ by 
+\begin_inset Formula $\varphi$
+\end_inset
+
+.
+ Every component of 
+\begin_inset Formula $G_{\varphi}[\alpha,\beta]$
+\end_inset
+
+ is either an even-cycle or a path.
+ By properly selecting 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ and 
+\begin_inset Formula $\beta$
+\end_inset
+
+ and exchanging the colours along some component (usually a path) in 
+\begin_inset Formula $G_{\varphi}[\alpha,\beta]$
+\end_inset
+
+, we free up one of previously forbidden 
+\begin_inset Formula $\alpha$
+\end_inset
+
+ or 
+\begin_inset Formula $\beta$
+\end_inset
+
+ to be used at a vertex while maintaining validity of the colouring.
+\end_layout
+
+\begin_layout Standard
+The algorithm to be implemented as part of our project will be Misra and
+ Gries's algorithm
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-9"
+
+\end_inset
+
+ that uses colouring fans.
+ An alternative algorithm exists that isn't based on colouring fans, but
+ rather counting arguments was discovered by Ehrenfeucht et al
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-10"
+
+\end_inset
+
+, which might be implemented as part of our project.
+\end_layout
+
+\begin_layout Section
+Results for other Graph Classes
+\end_layout
+
+\begin_layout Standard
+Even though Misra and Gries's algorithm will yield 
+\emph on
+good enough
+\emph default
+ results - since the upper bound on colours used is at worst, 
+\begin_inset Formula $\Delta+1$
+\end_inset
+
+; there exists specialised algorithms to decide whether graphs are in Class
+ 1/2 for certain graph classes.
+\end_layout
+
+\begin_layout Standard
+The problem of deciding whether a graph is in Class 1 or 2- known as the
+ Graph Classification Problem still has unknown complexity for many well-studied
+ graph classes
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-12"
+
+\end_inset
+
+- the most surprising being co-graphs (graphs which are 
+\begin_inset Formula $P_{4}$
+\end_inset
+
+-free).
+ Among a series of papers to investigate this problem, Vizing
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-16"
+
+\end_inset
+
+ proved that every graph in Class 2 has at least 3 vertices of maximum degree.
+\end_layout
+
+\begin_layout Standard
+Erdős and Wilson
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-11"
+
+\end_inset
+
+ proved that 
+\emph on
+almost every simple random graph is Class 1
+\emph default
+.
+ If 
+\begin_inset Formula $\mathcal{G\mathrm{(n,p)}}$
+\end_inset
+
+ is the probability space consisting of graphs of 
+\begin_inset Formula $n$
+\end_inset
+
+ vertices, and each possible edge is included independently with probability
+ 
+\begin_inset Formula $p$
+\end_inset
+
+, then almost every graph in 
+\begin_inset Formula $\mathcal{G\mathrm{(n,\frac{1}{2})}}$
+\end_inset
+
+ has 1 unique vertex of degree 
+\begin_inset Formula $\Delta$
+\end_inset
+
+ and is in Class 1.
+ In particular, as 
+\begin_inset Formula $n\rightarrow\infty$
+\end_inset
+
+, then 
+\begin_inset Formula $P(n)=U_{n}/V_{n}\rightarrow1$
+\end_inset
+
+, where 
+\begin_inset Formula $U_{n}$
+\end_inset
+
+ is the number of class 1 graphs and 
+\begin_inset Formula $V_{n}$
+\end_inset
+
+ is the total number of graphs with 
+\begin_inset Formula $n$
+\end_inset
+
+ vertices.
+\end_layout
+
+\begin_layout Standard
+It is worth noting that a method to determine whether a graph is Class 1/2
+ is by looking at structural properties of the core and semi-core of the
+ graph.
+ For example, Fournier
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-8"
+
+\end_inset
+
+ proved that if the core 
+\begin_inset Formula $G[\Lambda_{G}]$
+\end_inset
+
+ of a graph has no cycles, then 
+\begin_inset Formula $G$
+\end_inset
+
+ is Class 1 - this is consistent with Vizing's findings, since two vertices
+ cannot produce a cycle.
+\end_layout
+
+\begin_layout Standard
+Another result from Machado and de Figueiredo
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-2"
+
+\end_inset
+
+ builds on the previous result and shows that the chromatic index for a
+ graph is equal to the chromatic index of it's semi-core.
+ These results would benefit our project when we investigate graphs where
+ 
+\begin_inset Formula $|\Lambda_{G}|\leq k$
+\end_inset
+
+ - we should bound 
+\begin_inset Formula $k\geq3$
+\end_inset
+
+, and we know that if there is a cycle induced by 
+\begin_inset Formula $\Lambda_{G}$
+\end_inset
+
+ then 
+\begin_inset Formula $G$
+\end_inset
+
+ may be in Class 2.
+ Another nice consequence of this is that we only have to investigate connected
+ graphs.
+\end_layout
+
+\begin_layout Standard
+For planar graphs with 
+\begin_inset Formula $\Delta\geq8$
+\end_inset
+
+, it is shown by Chrobrak et al
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-13,key-14"
+
+\end_inset
+
+ that the colours needed is 
+\begin_inset Formula $\Delta$
+\end_inset
+
+, and we can compute such a colouring in polynomial time - 
+\begin_inset Formula $O(n\log n)$
+\end_inset
+
+ if 
+\begin_inset Formula $\Delta\geq9$
+\end_inset
+
+, and 
+\begin_inset Formula $O(n)$
+\end_inset
+
+ if 
+\begin_inset Formula $\Delta\geq19$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+For the well known family of partial 
+\begin_inset Formula $k$
+\end_inset
+
+-trees, which are subgraphs of 
+\begin_inset Formula $k$
+\end_inset
+
+-trees, there is a polynomial-time algorithm by Zhou et al
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-15"
+
+\end_inset
+
+ to compute the minimal edge colouring for fixed 
+\begin_inset Formula $k$
+\end_inset
+
+.
+ A 
+\begin_inset Formula $k$
+\end_inset
+
+-tree is defined recursively as follows
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-15"
+
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $K_{k}$
+\end_inset
+
+ is a 
+\begin_inset Formula $k$
+\end_inset
+
+-tree.
+\end_layout
+
+\begin_layout Enumerate
+A 
+\begin_inset Formula $k$
+\end_inset
+
+-tree with 
+\begin_inset Formula $n+1$
+\end_inset
+
+ vertices (
+\begin_inset Formula $n\geq k$
+\end_inset
+
+) can be constructed from a 
+\begin_inset Formula $k$
+\end_inset
+
+-tree 
+\begin_inset Formula $H$
+\end_inset
+
+ with 
+\begin_inset Formula $n$
+\end_inset
+
+ vertices by adding a vertex adjacent to exactly 
+\begin_inset Formula $k$
+\end_inset
+
+ vertices that form a 
+\begin_inset Formula $k$
+\end_inset
+
+-clique in 
+\begin_inset Formula $H$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+No other graphs are 
+\begin_inset Formula $k$
+\end_inset
+
+-trees.
+\end_layout
+
+\begin_layout Standard
+A partial 
+\begin_inset Formula $k$
+\end_inset
+
+-tree is a subgraph of a 
+\begin_inset Formula $k$
+\end_inset
+
+-tree.
+\end_layout
+
+\begin_layout Section
+Random Graph Generation
+\end_layout
+
+\begin_layout Standard
+There are a variety of random graph models - the most commonly studied model
+ being the Erdős–Rényi model
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-17"
+
+\end_inset
+
+, also known as the binomial graphs model – 
+\begin_inset Formula $\mathcal{G\mathrm{(n,p)}}$
+\end_inset
+
+ is the probability space consisting of graphs of 
+\begin_inset Formula $n$
+\end_inset
+
+ vertices, and each possible edge is included independently with probability
+ 
+\begin_inset Formula $p$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Another model is the Barabási–Albert Preferential Attachment model
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-18"
+
+\end_inset
+
+, which has 3 parameters: 
+\begin_inset Formula $n,m,m_{0}$
+\end_inset
+
+ where 
+\begin_inset Formula $n\geq m_{0}\geq m$
+\end_inset
+
+.
+ A graph is generated as follows: we start with 
+\begin_inset Formula $K_{m_{0}}$
+\end_inset
+
+, and then we add 
+\begin_inset Formula $n-m_{0}$
+\end_inset
+
+ nodes one by one as follows: each new node being added is attached to 
+\begin_inset Formula $m$
+\end_inset
+
+ random existing nodes.
+ The probability that the new node is connected to node 
+\begin_inset Formula $i$
+\end_inset
+
+ is 
+\begin_inset Formula ${\textstyle {\displaystyle p_{i}}=d(i)/\sum_{j}d(j)}$
+\end_inset
+
+.
+ This accurately simulates the growth of many real-life networks, such as
+ citation networks and the graph of hyperlinks on the internet.
+\end_layout
+
+\begin_layout Standard
+There are also some algorithms
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-19"
+
+\end_inset
+
+ for generating 
+\begin_inset Formula $k$
+\end_inset
+
+-regular graphs - graphs which vertices all have degree 
+\begin_inset Formula $k$
+\end_inset
+
+, but there seems to be very few if not no results on generating graphs
+ with certain forbidden subgraphs or graphs that have certain induced subgraph(s
+).
+\end_layout
+
+\begin_layout Section
+Conclusions
+\end_layout
+
+\begin_layout Standard
+As a start, we would implement the algorithm by Misra and Gries
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-9"
+
+\end_inset
+
+.
+ Then we would test the colours needed on a number of random graphs generated
+ using the binomial graph model 
+\begin_inset Formula $\mathcal{G\mathrm{(n,p)}}$
+\end_inset
+
+ - maybe parameterized over different values of both 
+\begin_inset Formula $n$
+\end_inset
+
+ and 
+\begin_inset Formula $p$
+\end_inset
+
+.
+ When computing an edge colouring for graphs, as mentioned before Machado
+ et al's results
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-2"
+
+\end_inset
+
+ help us greatly since we need only colour the semi-core of the graph instead
+ of the full graph – this would speed up the time needed for those tests.
+\end_layout
+
+\begin_layout Standard
+We would then randomly generate graphs where 
+\begin_inset Formula $|\Lambda_{G}|\leq k$
+\end_inset
+
+ (or 
+\begin_inset Formula $|\Lambda_{G}|\ll|N_{G}(\Lambda_{G})|$
+\end_inset
+
+) and check if any of them need 
+\begin_inset Formula $\Delta+1$
+\end_inset
+
+ colours by the algorithm; should any such graphs appear, we would investigate
+ their structure further.
+ Note that since we are computing the colouring using an algorithm that
+ makes no guarantees about optimality, we cannot state any rigorous results
+ (e.g.
+ that such graphs are definitely in Class 1/2), however it would maybe serve
+ as a good exploratory study in this field.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-1"
+
+\end_inset
+
+Diestel, R.
+ (2000).
+ Graph theory.
+ New York: Springer.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-2"
+
+\end_inset
+
+Machado, R.
+ and de Figueiredo, C.
+ (2010).
+ Decompositions for edge-coloring join graphs and cobipartite graphs.
+ Discrete Applied Mathematics, 158(12), pp.1336-1342.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-3"
+
+\end_inset
+
+Kőnig, D.
+ (1916).
+ Gráfok és alkalmazásuk a determinánsok és a halmazok elméletére.
+ Matematikai és Természettudományi Értesítő, (34), pp.104-119.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-4"
+
+\end_inset
+
+Vizing, V.G.
+ (1964).
+ On an estimate of the chromatic class of a p-graph.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-5"
+
+\end_inset
+
+Holyer, I.
+ (1981).
+ The NP-Completeness of Edge-Coloring.
+ SIAM Journal on Computing, 10(4), pp.718-720.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-6"
+
+\end_inset
+
+Behzad, M., Chartrand, G., and Cooper Jr., J.
+ K.
+ (1967).
+ The color numbers of complete graphs.
+ J.
+ London Math.
+ Soc., 42:226–228.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-7"
+
+\end_inset
+
+Gross, J.
+ and Yellen, J.
+ (2004).
+ Handbook of graph theory.
+ Boca Raton, Fla: CRC, p.462.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-8"
+
+\end_inset
+
+J.-C.
+ Fournier (1977).
+ Méthode et théorie générale de coloration des arêtes, J.
+ Math.
+ Pures Appl., (56), pp.
+ 437-453.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-9"
+
+\end_inset
+
+Misra, J.
+ and Gries, D.
+ (1992) ‘A constructive proof of Vizing’s theorem’, Information Processing
+ Letters.
+ Elsevier BV, 41(3), pp.
+ 131–133.
+ doi: 10.1016/0020-0190(92)90041-s.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-10"
+
+\end_inset
+
+Ehrenfeucht, A, Faber, V & Kierstead, H 1984, 'A new method of proving theorems
+ on chromatic index', Discrete Mathematics, vol.
+ 52, no.
+ 2-3, pp.
+ 159-164.
+ doi: 10.1016/0012-365X(84)90078-5 
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-11"
+
+\end_inset
+
+Erdős, P.
+ and Wilson, R.
+ (1977).
+ On the chromatic index of almost all graphs.
+ Journal of Combinatorial Theory, Series B, 23(2-3), pp.255-257.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-12"
+
+\end_inset
+
+Cao, Y., Chen, G., Jing, G.
+ et al.
+ Graphs and Combinatorics (2019) 35: 33.
+ https://doi.org/10.1007/s00373-018-1986-5
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-13"
+
+\end_inset
+
+Chrobak, M., Nishizeki, T.
+ (1990).
+ Improved edge-coloring algorithms for planar graphs.
+ Journal of Algorithms, 11, 102-116.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-14"
+
+\end_inset
+
+Chrobak, M., Yung, M.
+ (1989): Fast algorithms for edge-coloring planar graphs, dourna/of Algorithms
+ 10, 35-51.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-15"
+
+\end_inset
+
+Zhou, X., Nakano, S., & Nishizeki, T.
+ (1993).
+ A Linear Algorithm for Edge-Coloring Partial k-Trees.
+ ESA.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-16"
+
+\end_inset
+
+Vizing, V.G.
+ (1965).
+ Critical Graphs with Given Chromatic Class, Diskret, Analiz 5 , pp 9–1
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-17"
+
+\end_inset
+
+Erdős, P., and Rényi, A.
+ (1959).
+ On Random Graphs.
+ I.
+ Publicationes Mathematicae.
+ 6: 290–297.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-18"
+
+\end_inset
+
+Barabási, A.-L.; Albert, R.
+ (1999).
+ Emergence of scaling in random networks.
+ Science.
+ 286 (5439): 509–512.
+ doi:10.1126/science.286.5439.509.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-19"
+
+\end_inset
+
+Kim, J.H.; Van H.
+ Vu.
+ (2003).
+ Generating random regular graphs.
+ doi:10.1145/780542.780576 
+\end_layout
+
+\end_body
+\end_document

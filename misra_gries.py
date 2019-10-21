@@ -51,10 +51,7 @@ def misra_gries(G: nx.Graph):
 
 
 def colours_used(G: nx.Graph):
-    colours = set()
-    for edge in G.edges:
-        colours.add(G.edges[edge]['colour'])
-    return len(colours)
+    return len({edge_data['colour'] for edge_data in G.edges.values()})
 
 
 def is_class_one(G: nx.Graph):

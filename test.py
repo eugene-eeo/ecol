@@ -15,7 +15,7 @@ def test_bipartite():
 def test_general():
     print("Testing for K_n")
     for n in range(10, 60):
-        g = prep(nx.random_graphs.erdos_renyi_graph(n, 1))
+        g = prep(nx.complete_graph(n))
         misra_gries(g)
         assert validate_colouring(g)
 

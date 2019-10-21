@@ -14,8 +14,9 @@ def maximal_fan(G, X, Y, colours):
     found = True
     while found:
         found = False
+        free = free_colours(G[F[-1]], colours)
         for v in S:
-            if G.edges[X, v]['colour'] in free_colours(G[F[-1]], colours):
+            if G.edges[X, v]['colour'] in free:
                 F.append(v)
                 S.remove(v)
                 found = True
@@ -42,7 +43,19 @@ def misra_gries(G: nx.Graph):
         d = free_colours(G[F[-1]], colours).pop()
         flip_path_containing(G, X, c, d)
 
-        for w in F:
+        for i, w in enumerate(F):
             if d in free_colours(G[w], colours):
-                rotate(G, X, F[:F.index(w)+1], d)
+                rotate(G, X, F[:i+1], d)
                 break
+    return G
+
+
+def colours_used(G: nx.Graph):
+    colours = set()
+    for edge in G.edges:
+        colours.add(G.edges[edge]['colour'])
+    return len(colours)
+
+
+def is_class_one(G: nx.Graph):
+    return colours_used(G) == max_degree(G)

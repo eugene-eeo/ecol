@@ -10,16 +10,14 @@ def rotate(G, v, W, colour):
 
 def maximal_fan(G, X, Y, colours):
     F = [Y]
-    S = {Y}
+    S = set(G[X]) - {Y}
     found = True
     while found:
         found = False
-        for v in G[X]:
-            if (v not in S and
-                    G.edges[X, v]['colour'] in
-                    free_colours(G[F[-1]], colours)):
+        for v in S:
+            if G.edges[X, v]['colour'] in free_colours(G[F[-1]], colours):
                 F.append(v)
-                S.add(v)
+                S.remove(v)
                 found = True
                 break
     return F

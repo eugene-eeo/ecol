@@ -37,6 +37,7 @@ def get_path(G: Graph, v, alpha, beta) -> [int]:
 
 
 def vizing_heuristic(G: Graph):
+    # http://www.din.uem.br/sbpo/sbpo2012/pdf/arq0521.pdf
     delta = max_degree(G)
     free = {v: set(range(1, delta + 1)) for v in G.nodes()}
     taboo = None

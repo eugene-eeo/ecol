@@ -1,49 +1,41 @@
 import random
 import string
-import networkx as nx
 import graphviz
+from graph import Graph
 from itertools import cycle
 
 
 def random_bipartite_graph():
     A = random.sample(string.ascii_lowercase, random.randint(2, 23))
     B = random.sample(string.ascii_uppercase, random.randint(2, 23))
-    G = nx.Graph()
-    G.add_nodes_from(A)
-    G.add_nodes_from(B)
-    for u in A:
+    G = Graph(len(A) + len(B))
+    for i, u in enumerate(A):
         neighbours = random.sample(B, random.randint(1, len(B)))
-        G.add_edges_from([(u, v) for v in neighbours])
+        for x in neighbours:
+            G[i, len(A) + B.index(x)] = 0
     return G
 
 
-def plot_graph(G: nx.Graph):
+def plot_graph(G: Graph):
     dot = graphviz.Graph()
     dot.graph_attr['rankdir'] = 'LR'
     dot.graph_attr['ratio'] = '0.95'
     for node in G.nodes():
         dot.node(str(node), str(node))
     for u, v in G.edges():
-        dot.edge(str(u), str(v), label=str(G.edges[u, v]['colour']))
+        dot.edge(str(u), str(v), label=str(G[u, v]))
     return dot
 
 
-def prep(G: nx.Graph):
-    for u, v in G.edges:
-        G.edges[u, v]['colour'] = None
-    return G
+def max_degree(G: Graph):
+    return max(G.degree(n) for n in G.nodes())
 
 
-def max_degree(G: nx.Graph):
-    return max(n for _, n in G.degree())
-
-
-def free_colours(edges, colours):
+def free_colours(G: Graph, u, colours: set):
     """
-    Usage: free_colours(G[u], colours)
+    Usage: free_colours(G, u, colours)
     """
-    used = set(x['colour'] for _, x in edges.items())
-    return colours - used
+    return colours.difference(G[u, v] for v in G.neighbours(u))
 
 
 def flip_path_containing(G, v, alpha, beta):
@@ -62,16 +54,16 @@ def flip_path_containing(G, v, alpha, beta):
     if e:
         _, x = e
         flip(G, x, beta, alpha)
-        G.edges[e]['colour'] = beta
+        G[e] = beta
     if f:
         _, y = f
         flip(G, y, alpha, beta)
-        G.edges[f]['colour'] = alpha
+        G[f] = alpha
 
 
-def find_edge_with_colour(G, u, colour, prev=None):
-    for v in G[u]:
-        if G.edges[u, v]['colour'] == colour and v != prev:
+def find_edge_with_colour(G: Graph, u, colour, prev=None):
+    for v in G.neighbours(u):
+        if G[u, v] == colour and v != prev:
             return u, v
 
 
@@ -97,34 +89,32 @@ def flip(G, start, alpha, beta):
         if edge is None:
             break
 
-        G.edges[edge]['colour'] = to_replace
+        G[edge] = to_replace
         _, u = edge
         if u == start:
             break
 
 
-def edge_colour_bipartite(G: nx.Graph):
+def edge_colour_bipartite(G: Graph):
     colours = set(range(1, max_degree(G) + 1))
-    for u, v in G.edges:
-        u_free = free_colours(G[u], colours)
-        v_free = free_colours(G[v], colours)
+    for u, v in G.edges():
+        u_free = free_colours(G, u, colours)
+        v_free = free_colours(G, v, colours)
         common = u_free & v_free
 
         if common:
-            colour = common.pop()
-            G.edges[u, v]['colour'] = colour
+            G[u, v] = common.pop()
             continue
 
         alpha = u_free.pop()
         beta = v_free.pop()
         flip(G, u, beta, alpha)
-        G.edges[u, v]['colour'] = beta
+        G[u, v] = beta
 
 
-def validate_colouring(G: nx.Graph):
-    for u in G.nodes:
-        x = {data['colour'] for data in G[u].values()}
-        if len(x) != G.degree[u]:
-            print(u)
+def validate_colouring(G: Graph):
+    for u in G.nodes():
+        x = {G[u, v] for v in G.neighbours(u)}
+        if len(x) != G.degree(u):
             return False
     return True

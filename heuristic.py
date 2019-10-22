@@ -1,37 +1,26 @@
 from graph import Graph
-from bipartite import max_degree
+from bipartite import max_degree, find_edge_with_colour
 from itertools import cycle
 
 
 def switch(G: Graph, P: [int], alpha, beta, unset_colour, set_colour):
     for i in range(len(P)-1):
-        u = P[i]
-        v = P[i+1]
-        unset_colour((u, v))
+        unset_colour((P[i], P[i+1]))
 
     swatch = [beta, alpha]
     for i in range(len(P)-1):
-        u = P[i]
-        v = P[i+1]
-        c = swatch[i % 2]
-        set_colour((u, v), c)
-
-
-def find_edge_with_colour(G: Graph, u, colour, prev=()):
-    for v in G.neighbours(u):
-        if G[u, v] == colour and v not in prev:
-            return u, v
+        set_colour((P[i], P[i+1]), swatch[i % 2])
 
 
 def get_path(G: Graph, v, alpha, beta) -> [int]:
-    seen = {v}
+    prev = None
     path = [v]
     for colour in cycle([alpha, beta]):
-        edge = find_edge_with_colour(G, path[-1], colour, seen)
+        edge = find_edge_with_colour(G, path[-1], colour, prev)
         if edge is None:
             break
+        prev = path[-1]
         _, next = edge
-        seen.add(next)
         path.append(next)
     return path
 
@@ -86,6 +75,6 @@ def vizing_heuristic(G: Graph):
                     unset_colour(e_1)
                     set_colour(e_0, a_0)
                     e_0 = e_1
-                    v_0 = e_1[0]
+                    v_0 = e_1[0]  # We know that w == P[-1]
                     taboo = a_0
     return G

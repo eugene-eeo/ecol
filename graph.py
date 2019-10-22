@@ -11,7 +11,10 @@ class Graph:
 
     def __getitem__(self, edge):
         x, y = edge
-        return self.edge_data[x][y]
+        data = self.edge_data[x][y]
+        if data is False:
+            raise KeyError
+        return data
 
     def __setitem__(self, edge, data):
         x, y = edge

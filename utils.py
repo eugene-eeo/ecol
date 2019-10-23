@@ -14,6 +14,10 @@ class ColouringGraph(Graph):
     def wrap(cls, g: Graph):
         return ColouringGraph(g.n, g.edge_data)
 
+    @classmethod
+    def copy(cls, g: Graph):
+        return ColouringGraph(g.n, [x[:] for x in g.edge_data])
+
     def add_colours(self, colours):
         for fc in self.free:
             fc.update(colours)

@@ -101,3 +101,11 @@ def validate_colouring(G: Graph):
         if len(x) != G.degree(u):
             return False
     return True
+
+
+def colours_used(G: ColouringGraph):
+    return len({G[edge] for edge in G.edges()})
+
+
+def is_class_one(G: ColouringGraph):
+    return colours_used(G) == max_degree(G)

@@ -52,11 +52,3 @@ def misra_gries(G: ColouringGraph):
                 rotate(G, X, F[:i+1], d)
                 break
     return G
-
-
-def colours_used(G: ColouringGraph):
-    return len({G[edge] for edge in G.edges()})
-
-
-def is_class_one(G: ColouringGraph):
-    return colours_used(G) == max_degree(G)

@@ -1,7 +1,7 @@
 from os import listdir
 from tabulate import tabulate
 
-from utils import ColouringGraph, validate_colouring, colours_used
+from utils import ColouringGraph, validate_colouring, colours_used, max_degree
 from dmacs2graph import dmacs2graph
 from heuristic import vizing_heuristic
 from misra_gries import misra_gries
@@ -23,9 +23,14 @@ def benchmark():
             misra_gries(h)
             assert validate_colouring(h)
 
-            data.append((name, colours_used(g), colours_used(h)))
+            data.append((
+                name,
+                max_degree(G),
+                colours_used(g),
+                colours_used(h),
+                ))
     data.sort()
-    print(tabulate(data, headers=["Instance", "ΔVh", "MG"]))
+    print(tabulate(data, headers=["Instance", "Δ", "ΔVh", "MG"]))
 
 
 if __name__ == '__main__':

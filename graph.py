@@ -56,3 +56,11 @@ def erdos_renyi_graph(n, p):
             if r.random() <= p:
                 g[i, j] = 0
     return g
+
+
+def complete_bipartite_graph(n, m):
+    G = Graph(n + m)
+    for i in range(n):
+        for j in range(m):
+            G[i, n + j] = 0
+    return G

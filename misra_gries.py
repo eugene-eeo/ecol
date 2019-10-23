@@ -1,20 +1,25 @@
-from graph import Graph
-from bipartite import free_colours, max_degree, flip_path_containing
+from utils import max_degree, switch_path_containing, ColouringGraph
 
 
-def rotate(G, v, W, colour):
+def rotate(G: ColouringGraph, v, W, colour):
+    colours = []
     for i in range(len(W) - 1):
-        G[v, W[i]] = G[v, W[i+1]]
+        colours.append(G[v, W[i+1]])
+        G[v, W[i]] = 0
+        G[v, W[i+1]] = 0
+
+    for i in range(len(W) - 1):
+        G[v, W[i]] = colours[i]
     G[v, W[-1]] = colour
 
 
-def maximal_fan(G: Graph, X, Y, colours):
+def maximal_fan(G: ColouringGraph, X, Y):
     F = [Y]
     S = set(G.neighbours(X)) - {Y}
     found = True
     while found:
         found = False
-        free = free_colours(G, F[-1], colours)
+        free = G.free[F[-1]]
         for v in S:
             if G[X, v] in free:
                 F.append(v)
@@ -24,12 +29,12 @@ def maximal_fan(G: Graph, X, Y, colours):
     return F
 
 
-def misra_gries(G: Graph):
+def misra_gries(G: ColouringGraph):
     # see http://www.cs.utexas.edu/users/misra/psp.dir/vizing.pdf
-    colours = set(range(1, max_degree(G) + 2))  # Delta+1 colours
+    G.add_colours(set(range(1, max_degree(G) + 2)))  # Delta+1 colours
     for X, Y in G.edges():
-        X_free = free_colours(G, X, colours)
-        Y_free = free_colours(G, Y, colours)
+        X_free = G.free[X]
+        Y_free = G.free[Y]
         common = X_free & Y_free
         # easy case
         if common:
@@ -37,22 +42,22 @@ def misra_gries(G: Graph):
             continue
 
         # construct a maximal fan:
-        F = maximal_fan(G, X, Y, colours)
+        F = maximal_fan(G, X, Y)
 
         c = min(X_free)
-        d = min(free_colours(G, F[-1], colours))
-        flip_path_containing(G, X, c, d)
+        d = min(G.free[F[-1]])
+        switch_path_containing(G, X, c, d)
 
         for i, w in enumerate(F):
-            if d in free_colours(G, w, colours):
+            if d in G.free[w]:
                 rotate(G, X, F[:i+1], d)
                 break
     return G
 
 
-def colours_used(G: Graph):
+def colours_used(G: ColouringGraph):
     return len({G[edge] for edge in G.edges()})
 
 
-def is_class_one(G: Graph):
+def is_class_one(G: ColouringGraph):
     return colours_used(G) == max_degree(G)

@@ -16,7 +16,7 @@ def maximal_fan(G: ColouringGraph, X, Y):
     F = [Y]
     S = set(G.neighbours(X)) - {Y}
     found = True
-    while found:
+    while found and S:
         found = False
         free = G.free[F[-1]]
         for v in S:

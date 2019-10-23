@@ -15,7 +15,7 @@ def test_bipartite(f):
 
 def test_general(f):
     print("  Testing for K_n")
-    for n in range(10, 60):
+    for n in range(10, 61):
         g = ColouringGraph.wrap(complete_graph(n))
         f(g)
         assert validate_colouring(g)
@@ -23,7 +23,7 @@ def test_general(f):
 
 def test_random(f):
     print("  Testing for G(n,p)")
-    for n in range(10, 60):
+    for n in range(10, 61):
         for p in [0.1, 0.2, 0.4, 0.8, 0.9]:
             g = ColouringGraph.wrap(erdos_renyi_graph(n, p))
             f(g)

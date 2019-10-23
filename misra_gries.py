@@ -3,9 +3,9 @@ from utils import max_degree, switch_path_containing, ColouringGraph
 
 def rotate(G: ColouringGraph, v, W, colour):
     colours = []
-    for i in range(len(W)):
-        colours.append(G[v, W[i]])
-        G[v, W[i]] = 0
+    for x in W:
+        colours.append(G[v, x])
+        G[v, x] = 0
 
     for i in range(len(W) - 1):
         G[v, W[i]] = colours[i+1]

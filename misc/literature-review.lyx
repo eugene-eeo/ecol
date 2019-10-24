@@ -752,6 +752,61 @@ key "key-2"
 \end_layout
 
 \begin_layout Standard
+A related result on the core of the graph was proven recently by Cranston
+ and Rabern
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-20"
+
+\end_inset
+
+.
+ The Hilton-Zhao conjecture is as follows: if 
+\begin_inset Formula $G$
+\end_inset
+
+ is connected with 
+\begin_inset Formula $\Lambda_{G}$
+\end_inset
+
+ having maximum degree 2, then 
+\begin_inset Formula $\chi'(G)>\Delta$
+\end_inset
+
+ iff 
+\begin_inset Formula $G$
+\end_inset
+
+ is overfull.
+ A graph 
+\begin_inset Formula $G$
+\end_inset
+
+ is 
+\emph on
+overfull
+\emph default
+ when 
+\begin_inset Formula $|E(G)|>\Delta\lfloor|V(G)|/2\rfloor$
+\end_inset
+
+.
+ They proved that it holds true for 
+\begin_inset Formula $\Delta=4$
+\end_inset
+
+.
+ Furthermore, any graph that is overfull is necessarily in Class 2; thus
+ it suffices for our research to look at graphs which are not overfull.
+ An interesting branch of research in this direction is to consider the
+ case for when 
+\begin_inset Formula $\Delta=5$
+\end_inset
+
+ and we still have the same constraints on the core of the graph.
+\end_layout
+
+\begin_layout Standard
 For planar graphs with 
 \begin_inset Formula $\Delta\geq8$
 \end_inset
@@ -1022,18 +1077,26 @@ key "key-2"
 
  help us greatly since we need only colour the semi-core of the graph instead
  of the full graph – this would speed up the time needed for those tests.
+ In particular, recreating Erdős and Wilson's result
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-11"
+
+\end_inset
+
+ empirally would be interesting.
 \end_layout
 
 \begin_layout Standard
 We would then randomly generate graphs where 
-\begin_inset Formula $|\Lambda_{G}|\leq k$
+\begin_inset Formula $\Delta=5$
 \end_inset
 
- (or 
-\begin_inset Formula $|\Lambda_{G}|\ll|N_{G}(\Lambda_{G})|$
+ and 
+\begin_inset Formula $G[\Lambda_{G}]$
 \end_inset
 
-) and check if any of them need 
+ have maximum degree 2, and check if any of them need 
 \begin_inset Formula $\Delta+1$
 \end_inset
 
@@ -1184,7 +1247,7 @@ Ehrenfeucht, A, Faber, V & Kierstead, H 1984, 'A new method of proving theorems
  52, no.
  2-3, pp.
  159-164.
- doi: 10.1016/0012-365X(84)90078-5 
+ doi: 10.1016/0012-365X(84)90078-5.
 \end_layout
 
 \begin_layout Bibliography
@@ -1261,7 +1324,7 @@ key "key-16"
 
 Vizing, V.G.
  (1965).
- Critical Graphs with Given Chromatic Class, Diskret, Analiz 5 , pp 9–1
+ Critical Graphs with Given Chromatic Class, Diskret, Analiz 5 , pp 9–1.
 \end_layout
 
 \begin_layout Bibliography
@@ -1305,7 +1368,21 @@ Kim, J.H.; Van H.
  Vu.
  (2003).
  Generating random regular graphs.
- doi:10.1145/780542.780576 
+ doi:10.1145/780542.780576.
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-20"
+
+\end_inset
+
+Cranston, D.
+ and Rabern, L.
+ (2019).
+ The Hilton--Zhao Conjecture is True for Graphs with Maximum Degree 4.
+ SIAM Journal on Discrete Mathematics, 33(3), pp.1228-1241.
 \end_layout
 
 \end_body

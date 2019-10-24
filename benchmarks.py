@@ -1,10 +1,10 @@
 from os import listdir
 from tabulate import tabulate
 
-from utils import ColouringGraph, validate_colouring, colours_used, max_degree
-from dmacs2graph import dmacs2graph
 from heuristic import vizing_heuristic
 from misra_gries import misra_gries
+from utils import ColouringGraph, validate_colouring, colours_used, \
+        max_degree, dmacs2graph
 
 
 def benchmark():

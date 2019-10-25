@@ -1088,7 +1088,20 @@ key "key-11"
 \end_layout
 
 \begin_layout Standard
-We would then randomly generate graphs where 
+One area of interest is in graphs where 
+\begin_inset Formula $|\Lambda_{G}|\leq k$
+\end_inset
+
+, where 
+\begin_inset Formula $k$
+\end_inset
+
+ is small compared to 
+\begin_inset Formula $|V|$
+\end_inset
+
+.
+ Another is where 
 \begin_inset Formula $\Delta=5$
 \end_inset
 
@@ -1096,12 +1109,13 @@ We would then randomly generate graphs where
 \begin_inset Formula $G[\Lambda_{G}]$
 \end_inset
 
- have maximum degree 2, and check if any of them need 
+ have maximum degree 2.
+ We would randomly generate such graphs and check if any of them need 
 \begin_inset Formula $\Delta+1$
 \end_inset
 
- colours by the algorithm; should any such graphs appear, we would investigate
- their structure further.
+ colours by the algorithm; we would investigate their structure further
+ should any such instances appear.
  Note that since we are computing the colouring using an algorithm that
  makes no guarantees about optimality, we cannot state any rigorous results
  (e.g.

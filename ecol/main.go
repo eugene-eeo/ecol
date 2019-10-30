@@ -1,12 +1,13 @@
 package main
 
+import "os"
+import "bufio"
 import "fmt"
 import "math/rand"
-import "time"
 import "sync"
 
-func erdos_renyi_graph(n int, p float64) *ColouringGraph {
-	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+func erdos_renyi_graph(n int, p float64, seed int64) *ColouringGraph {
+	r := rand.New(rand.NewSource(seed))
 	g := NewGraph(n)
 	for i := 0; i < n; i++ {
 		for j := i + 1; j < n; j++ {
@@ -41,9 +42,13 @@ type Result struct {
 }
 
 func main() {
-	P := []float64{0.125, 0.25, 0.5, 0.75, 0.95}
-	R := 5000
+	P := []float64{0.95}
+	R := 10000
 
+	w := bufio.NewWriter(os.Stdout)
+	defer w.Flush()
+
+	seedsChan := make(chan int64, 8)
 	paramsChan := make(chan Params, 8)
 	resultsChan := make(chan Result, 8)
 	wg := &sync.WaitGroup{}
@@ -52,12 +57,20 @@ func main() {
 	rg := &sync.WaitGroup{}
 	rg.Add(1)
 
+	go func() {
+		n := int64(0)
+		for {
+			n++
+			seedsChan <- n
+		}
+	}()
+
 	for i := 0; i < 8; i++ {
 		go func() {
 			for param := range paramsChan {
 				n := param.n
 				p := param.p
-				g := erdos_renyi_graph(n, p)
+				g := erdos_renyi_graph(n, p, <-seedsChan)
 				vizing_heuristic(g)
 				resultsChan <- Result{n, p, max_degree(g), colours_used(g)}
 			}
@@ -66,15 +79,15 @@ func main() {
 	}
 
 	go func() {
-		fmt.Println("n,p,delta,colours_used")
+		fmt.Fprintln(w, "n,p,delta,colours_used")
 		for r := range resultsChan {
-			fmt.Printf("%d,%f,%d,%d\n", r.n, r.p, r.delta, r.colours_used)
+			fmt.Fprintf(w, "%d,%f,%d,%d\n", r.n, r.p, r.delta, r.colours_used)
 		}
 		rg.Done()
 	}()
 
 	for _, p := range P {
-		for n := 1; n < 200; n += 5 {
+		for n := 1; n < 200; n += 1 {
 			for i := 0; i < R; i++ {
 				paramsChan <- Params{n, p}
 			}

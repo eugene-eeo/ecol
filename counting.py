@@ -50,7 +50,7 @@ def counting_colour(G: ColouringGraph):
             # Pick a w
             w = min(W, key=lambda v: len(F_u[v]))
             # consider a colour 'a'
-            a = min(F_u[w] - {b})
+            a = min(F_u[w])
             P = get_path_subset(G, w, V, b, a)
             switch(G, P, b, a)
             G[u, w] = b

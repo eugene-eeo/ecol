@@ -20,19 +20,21 @@ func counting_colour(G *ColouringGraph) {
 		// u := current node to colour
 		// Compute F_u[x] = F(ux) = F(u) & F(x)
 		// Everything up to u is in V
+		N := 0
 		for v := 0; v < u; v++ {
 			if G.g.edge_data[u][v] == 0 {
 				F_u[uint(v)] = G.free[u].Intersection(G.free[v])
+				N++
 			}
 		}
-		for len(F_u) > 0 {
+	OUTER:
+		for n := 0; n < N; n++ {
 			// Compute union of all F(uv) (v in W)
 			C.ClearAll()
-			for _, v := range F_u {
-				C.InPlaceUnion(v)
+			for _, fset := range F_u {
+				C.InPlaceUnion(fset)
 			}
 
-			found := false
 			for l, e := C.NextSet(0); e; l, e = C.NextSet(l + 1) {
 				v := uint(0)      // v s.t. |F_uv| is minimum
 				c_min := max_size // Minimum size of F_uv
@@ -49,24 +51,19 @@ func counting_colour(G *ColouringGraph) {
 						}
 					}
 				}
-				found = count <= 1
 				// Case (1)
-				if found {
+				if count <= 1 {
 					G.Set(u, int(v), int(l))
 					delete(F_u, v)
 					for _, fset := range F_u {
 						fset.SetTo(l, false)
 					}
-					break
+					continue OUTER
 				}
-			}
-			if found {
-				continue
 			}
 			// Case (2)
 			G.free[u].Copy(F)
 			F.InPlaceDifference(C)
-			//F = G.free[u].Difference(C)
 			b, _ := F.NextSet(0)
 			w := uint(0)
 			best_size := max_size

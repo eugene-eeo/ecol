@@ -2,6 +2,7 @@ from graph import complete_graph, erdos_renyi_graph, complete_bipartite_graph
 from utils import validate_colouring, ColouringGraph
 from misra_gries import misra_gries
 from heuristic import vizing_heuristic
+from counting import counting_colour
 
 
 def test_bipartite(f):
@@ -31,7 +32,7 @@ def test_random(f):
 
 
 if __name__ == '__main__':
-    for f in [misra_gries, vizing_heuristic]:
+    for f in [misra_gries, vizing_heuristic, counting_colour]:
         print(f"{f.__name__}:")
         test_bipartite(f)
         test_general(f)

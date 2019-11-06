@@ -51,6 +51,23 @@ def switch(G: ColouringGraph, P: [int], alpha, beta):
         G[P[i], P[i+1]] = swatch[i % 2]
 
 
+def find_edge_with_colour_subset(G: ColouringGraph, u, colour, subset: set):
+    for v in subset.intersection(G.neighbours(u)):
+        if G[u, v] == colour:
+            return u, v
+
+
+def get_path_subset(G: ColouringGraph, v, subset, alpha, beta) -> [int]:
+    path = [v]
+    for colour in cycle([alpha, beta]):
+        edge = find_edge_with_colour_subset(G, path[-1], colour, subset)
+        if edge is None:
+            break
+        _, next = edge
+        path.append(next)
+    return path
+
+
 def find_edge_with_colour(G: ColouringGraph, u, colour, prev=None):
     for v in G.neighbours(u):
         if G[u, v] == colour and v != prev:

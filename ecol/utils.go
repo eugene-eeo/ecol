@@ -1,6 +1,5 @@
 package main
 
-import "fmt"
 import "github.com/willf/bitset"
 
 type ColouringGraph struct {
@@ -71,10 +70,45 @@ func (cg *ColouringGraph) NextUncolouredEdge() Edge {
 	return Edge{-1, -1}
 }
 
-func find_endpoint_with_colour(cg *ColouringGraph, u int, colour int, prev int) int {
-	for i := 0; i < cg.g.n; i++ {
-		e := cg.g.edge_data[u][i]
-		if e == colour && i != prev {
+// Utility functions
+
+func find_endpoint_with_colour_subset(cg *ColouringGraph, u int, colour int, subset *bitset.BitSet) int {
+	for i := 0; i < u; i++ {
+		if cg.g.edge_data[u][i] == colour && subset.Test(uint(i)) {
+			return i
+		}
+	}
+	for i := u + 1; i < cg.g.n; i++ {
+		if cg.g.edge_data[u][i] == colour && subset.Test(uint(i)) {
+			return i
+		}
+	}
+	return -1
+}
+
+func get_path_subset(cg *ColouringGraph, v int, subset *bitset.BitSet, alpha, beta int, path []int) []int {
+	path[0] = v
+	swatch := [2]int{beta, alpha}
+	length := 1
+	for {
+		endpoint := find_endpoint_with_colour_subset(cg, path[length-1], swatch[length%2], subset)
+		if endpoint == -1 {
+			break
+		}
+		path[length] = endpoint
+		length++
+	}
+	return path[:length]
+}
+
+func find_endpoint_with_colour(cg *ColouringGraph, u int, colour int) int {
+	for i := 0; i < u; i++ {
+		if cg.g.edge_data[u][i] == colour {
+			return i
+		}
+	}
+	for i := u + 1; i < cg.g.n; i++ {
+		if cg.g.edge_data[u][i] == colour {
 			return i
 		}
 	}
@@ -87,15 +121,13 @@ func allocate_path_array(cg *ColouringGraph) []int {
 
 func get_path(cg *ColouringGraph, v int, alpha, beta int, path []int) []int {
 	path[0] = v
-	prev := -1
 	swatch := [2]int{beta, alpha}
 	length := 1
 	for {
-		endpoint := find_endpoint_with_colour(cg, path[length-1], swatch[length%2], prev)
+		endpoint := find_endpoint_with_colour(cg, path[length-1], swatch[length%2])
 		if endpoint == -1 {
 			break
 		}
-		prev = path[length-1]
 		path[length] = endpoint
 		length++
 	}
@@ -140,10 +172,6 @@ func validate_colouring(cg *ColouringGraph) bool {
 			}
 		}
 		if x.Count() != uint(cg.g.Degree(i)) {
-			fmt.Println("=================")
-			fmt.Println("Invalid")
-			fmt.Println(i)
-			fmt.Println(cg.g.edge_data[i])
 			return false
 		}
 	}

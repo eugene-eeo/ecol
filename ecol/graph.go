@@ -61,3 +61,11 @@ func (g *Graph) Neighbours(u int) []int {
 	}
 	return N
 }
+
+func (g *Graph) CopyInto(h *Graph) {
+	for i, x := range g.edge_data {
+		for j, v := range x {
+			h.edge_data[i][j] = v
+		}
+	}
+}

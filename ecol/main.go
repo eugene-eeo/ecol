@@ -59,11 +59,12 @@ type ERBenchmark struct {
 }
 
 func main() {
-	for i := 0; i < 100; i++ {
+	for i := 1; i <= 100; i++ {
 		cg := complete_graph(i)
-		vizing_heuristic(cg)
+		counting_colour(cg)
 		if !validate_colouring(cg) {
-			fmt.Println("FAIL")
+			fmt.Println("FAIL", i)
+			//break
 		}
 	}
 }

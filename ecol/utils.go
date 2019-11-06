@@ -72,26 +72,22 @@ func (cg *ColouringGraph) NextUncolouredEdge() Edge {
 
 // Utility functions
 
-func find_endpoint_with_colour_subset(cg *ColouringGraph, u int, colour int, subset *bitset.BitSet) int {
-	for i := 0; i < u; i++ {
-		if cg.g.edge_data[u][i] == colour && subset.Test(uint(i)) {
-			return i
-		}
-	}
-	for i := u + 1; i < cg.g.n; i++ {
-		if cg.g.edge_data[u][i] == colour && subset.Test(uint(i)) {
+func find_endpoint_with_colour_subset(cg *ColouringGraph, u int, colour int, limit int) int {
+	row := cg.g.edge_data[u]
+	for i := 0; i <= limit; i++ {
+		if i != u && row[i] == colour {
 			return i
 		}
 	}
 	return -1
 }
 
-func get_path_subset(cg *ColouringGraph, v int, subset *bitset.BitSet, alpha, beta int, path []int) []int {
+func get_path_subset(cg *ColouringGraph, v int, alpha, beta int, path []int, limit int) []int {
 	path[0] = v
 	swatch := [2]int{beta, alpha}
 	length := 1
 	for {
-		endpoint := find_endpoint_with_colour_subset(cg, path[length-1], swatch[length%2], subset)
+		endpoint := find_endpoint_with_colour_subset(cg, path[length-1], swatch[length%2], limit)
 		if endpoint == -1 {
 			break
 		}

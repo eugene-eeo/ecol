@@ -11,6 +11,7 @@ func counting_heuristic_colour(G *ColouringGraph) {
 	delta := uint(max_degree(G))
 	colours := bitset.New(delta + 2).Complement()
 	colours.SetTo(0, false)
+	colours.SetTo(delta+1, false)
 	G.AddColours(colours)
 	max_size := delta + 2
 

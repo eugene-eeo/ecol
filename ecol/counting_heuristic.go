@@ -17,6 +17,9 @@ func counting_heuristic_colour(G *ColouringGraph) {
 	P := allocate_path_array(G)
 	C := bitset.New(uint(G.g.n)) // Used to compute F(uv_1) U F(uv_2) U ...
 	F := bitset.New(uint(G.g.n)) // Used to compute F(u) \ C
+	N := 0
+	var f_u *bitset.BitSet = nil
+	var r []int = nil
 
 	F_u := make(map[int]*FreesetInfo, G.g.n)
 	// Use this to populate F_u to avoid reallocs
@@ -30,9 +33,9 @@ func counting_heuristic_colour(G *ColouringGraph) {
 		// u := current node to colour
 		// All nodes < u is in V, so we don't have to store it in a set
 		// W is implicitly captured in keys of F_u
-		N := 0
-		f_u := G.free[u]
-		r := G.g.edge_data[u]
+		N = 0
+		f_u = G.free[u]
+		r = G.g.edge_data[u]
 		// Compute F_u[x] = F(ux) = F(u) & F(x)
 		for v := 0; v < u; v++ {
 			if r[v] == 0 {
@@ -80,6 +83,7 @@ func counting_heuristic_colour(G *ColouringGraph) {
 					continue OUTER
 				}
 			}
+
 			// Case (2)
 			G.free[u].Copy(F)
 			F.InPlaceDifference(C)
@@ -101,10 +105,13 @@ func counting_heuristic_colour(G *ColouringGraph) {
 				G.AddColour(delta + 1)
 				goto RESTART
 			}
+
 			// Switch G[0..u][a,b]
-			P2 := get_path_subset(G, w, int(b), int(a), P, u)
-			switch_path(G, P2, int(b), int(a))
-			G.Set(u, w, int(b))
+			bc := int(b)
+			ac := int(a)
+			P2 := get_path_subset(G, w, bc, ac, P, u)
+			switch_path(G, P2, bc, ac)
+			G.Set(u, w, bc)
 			// Update F_u
 			delete(F_u, w)
 			// If P2[-1] in W

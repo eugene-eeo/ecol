@@ -3,11 +3,9 @@ package main
 import "github.com/willf/bitset"
 
 func vizing_heuristic(cg *ColouringGraph) {
-	delta := max_degree(cg)
-	colours := bitset.New(uint(delta) + 1)
-	for i := 1; i < delta+1; i++ {
-		colours.Set(uint(i))
-	}
+	delta := uint(max_degree(cg))
+	colours := bitset.New(delta + 2).Complement()
+	colours.SetTo(0, false)
 	cg.AddColours(colours)
 
 	// 'globals'
@@ -16,7 +14,7 @@ func vizing_heuristic(cg *ColouringGraph) {
 	v_0 := -1
 	beta := uint(0)
 	P := allocate_path_array(cg)
-	S := bitset.New(uint(delta + 2))
+	S := bitset.New(delta + 2)
 
 	for len(cg.uncoloured) > 0 {
 		if taboo == 0 {
@@ -39,8 +37,8 @@ func vizing_heuristic(cg *ColouringGraph) {
 			S.SetTo(taboo, false)
 
 			if S.None() {
-				cg.AddColour(uint(delta + 1))
-				cg.Set(w, v_0, delta+1)
+				cg.AddColour(delta + 1)
+				cg.Set(w, v_0, int(delta+1))
 				taboo = 0
 			} else {
 				a_0, _ := S.NextSet(0)

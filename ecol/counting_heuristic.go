@@ -15,32 +15,33 @@ func counting_heuristic_colour(G *ColouringGraph) {
 	max_size := delta + 2
 
 	P := allocate_path_array(G)
-	C := bitset.New(uint(G.g.n))
-	F := bitset.New(uint(G.g.n))
+	C := bitset.New(uint(G.g.n)) // Used to compute F(uv_1) U F(uv_2) U ...
+	F := bitset.New(uint(G.g.n)) // Used to compute F(u) \ C
 
 	F_u := make(map[int]*FreesetInfo, G.g.n)
 	// Use this to populate F_u to avoid reallocs
-	fset_cache := make([]*FreesetInfo, G.g.n)
-	for i := range fset_cache {
-		fset_cache[i] = &FreesetInfo{bitset.New(delta + 2), 0}
+	fsets := make([]*FreesetInfo, G.g.n)
+	for i := range fsets {
+		fsets[i] = &FreesetInfo{bitset.New(delta + 2), 0}
 	}
 
 	for u := 0; u < G.g.n; u++ {
 	RESTART:
 		// u := current node to colour
-		// Compute F_u[x] = F(ux) = F(u) & F(x)
-		// Everything up to u is in V
+		// All nodes < u is in V, so we don't have to store it in a set
+		// W is implicitly captured in keys of F_u
 		N := 0
 		f_u := G.free[u]
 		r := G.g.edge_data[u]
+		// Compute F_u[x] = F(ux) = F(u) & F(x)
 		for v := 0; v < u; v++ {
 			if r[v] == 0 {
-				fi := fset_cache[v]
+				N++
+				fi := fsets[v]
 				f_u.Copy(fi.fset)
 				fi.fset.InPlaceIntersection(G.free[v])
 				fi.size = fi.fset.Count()
 				F_u[v] = fi
-				N++
 			}
 		}
 	OUTER:
@@ -71,8 +72,10 @@ func counting_heuristic_colour(G *ColouringGraph) {
 					G.Set(u, v, int(l))
 					delete(F_u, v)
 					for _, fi := range F_u {
-						fi.fset.SetTo(l, false)
-						fi.size = fi.fset.Count()
+						if fi.fset.Test(l) {
+							fi.fset.SetTo(l, false)
+							fi.size--
+						}
 					}
 					continue OUTER
 				}

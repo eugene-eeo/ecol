@@ -52,16 +52,6 @@ func (g *Graph) Degree(u int) int {
 	return d
 }
 
-func (g *Graph) Neighbours(u int) []int {
-	N := []int{}
-	for i := 0; i < g.n; i++ {
-		if g.edge_data[u][i] != -1 {
-			N = append(N, i)
-		}
-	}
-	return N
-}
-
 func (g *Graph) CopyInto(h *Graph) {
 	for i, x := range g.edge_data {
 		for j, v := range x {

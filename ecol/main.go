@@ -11,7 +11,6 @@ func complete_bipartite_graph(n int, m int) *ColouringGraph {
 	for i := 0; i < n; i++ {
 		for j := 0; j < m; j++ {
 			g.Set(i, n+j, 0)
-			g.Set(n+j, i, 0)
 		}
 	}
 	return WrapGraph(g)
@@ -40,7 +39,6 @@ func complete_graph(k int) *ColouringGraph {
 	for i := 0; i < k; i++ {
 		for j := i + 1; j < k; j++ {
 			g.Set(i, j, 0)
-			g.Set(j, i, 0)
 		}
 	}
 	return WrapGraph(g)

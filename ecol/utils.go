@@ -98,13 +98,14 @@ func get_path_subset(cg *ColouringGraph, v int, alpha, beta int, path []int, lim
 }
 
 func find_endpoint_with_colour(cg *ColouringGraph, u int, colour int) int {
+	row := cg.g.edge_data[u]
 	for i := 0; i < u; i++ {
-		if cg.g.edge_data[u][i] == colour {
+		if row[i] == colour {
 			return i
 		}
 	}
 	for i := u + 1; i < cg.g.n; i++ {
-		if cg.g.edge_data[u][i] == colour {
+		if row[i] == colour {
 			return i
 		}
 	}

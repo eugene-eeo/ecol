@@ -59,8 +59,8 @@ type ERBenchmark struct {
 func main() {
 	for n := 0; n <= 200; n++ {
 		G := complete_graph(n)
-		//vizing_heuristic(G)
-		counting_heuristic_colour(G)
+		vizing_heuristic(G)
+		//counting_heuristic_colour(G)
 		if !validate_colouring(G) {
 			fmt.Println("FAIL", n)
 			break

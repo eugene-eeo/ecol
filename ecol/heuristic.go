@@ -6,6 +6,7 @@ func vizing_heuristic(cg *ColouringGraph) {
 	delta := uint(max_degree(cg))
 	colours := bitset.New(delta + 2).Complement()
 	colours.SetTo(0, false)
+	colours.SetTo(delta+1, false)
 	cg.AddColours(colours)
 
 	// 'globals'

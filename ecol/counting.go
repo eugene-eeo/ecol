@@ -3,7 +3,7 @@ package main
 import "github.com/willf/bitset"
 
 func counting_colour(G *ColouringGraph) {
-	delta := uint(max_degree(G))
+	delta := uint(max_degree(G.g))
 	colours := bitset.New(delta + 2).Complement()
 	colours.SetTo(0, false)
 	G.AddColours(colours)

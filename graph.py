@@ -27,6 +27,15 @@ class Graph:
     def degree(self, node):
         return sum(1 for x in self.edge_data[node] if x is not False)
 
+    def num_edges(self):
+        n = 0
+        for i in range(self.n):
+            row = self.edge_data[i]
+            for j in range(i+1, self.n):
+                if row[j] is not False:
+                    n += 1
+        return n
+
     def edges(self):
         for i in range(self.n):
             row = self.edge_data[i]

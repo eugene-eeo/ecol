@@ -8,7 +8,7 @@ type FreesetInfo struct {
 }
 
 func counting_heuristic_colour(G *ColouringGraph) {
-	delta := uint(max_degree(G))
+	delta := uint(max_degree(G.g))
 	colours := bitset.New(delta + 2).Complement()
 	colours.SetTo(0, false)
 	colours.SetTo(delta+1, false)

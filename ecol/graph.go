@@ -30,6 +30,18 @@ func (g *Graph) Set(i, j, v int) {
 	g.edge_data[j][i] = v
 }
 
+func (g *Graph) EdgeCount() int {
+	n := 0
+	for i := 0; i < g.n; i++ {
+		for j := i; j < g.n; j++ {
+			if g.edge_data[i][j] != -1 {
+				n++
+			}
+		}
+	}
+	return n
+}
+
 func (g *Graph) Edges() []Edge {
 	edges := []Edge{}
 	for i := 0; i < g.n; i++ {

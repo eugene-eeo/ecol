@@ -101,14 +101,30 @@ def max_degree(G: Graph):
     return max(G.degree(n) for n in G.nodes())
 
 
-def plot_graph(G: Graph):
+def plot_graph(G: Graph, with_labels=True):
     dot = graphviz.Graph()
-    dot.graph_attr['rankdir'] = 'LR'
-    dot.graph_attr['ratio'] = '0.95'
-    for node in G.nodes():
+    # dot.graph_attr['rankdir'] = 'LR'
+    # dot.graph_attr['ratio'] = '0.95'
+
+    delta = max_degree(G)
+    nodes = set(G.nodes())
+    core = {x for x in nodes if G.degree(x) == delta}
+
+    with dot.subgraph() as s:
+        s.attr(rank='same')
+        s.attr('node', style='solid,filled', color='black', fillcolor='grey')
+        for node in core:
+            s.node(str(node), str(node))
+
+    for node in nodes - core:
         dot.node(str(node), str(node))
+
     for u, v in G.edges():
-        dot.edge(str(u), str(v), label=str(G[u, v]))
+        if with_labels:
+            dot.edge(str(u), str(v), label=str(G[u, v]))
+        else:
+            dot.edge(str(u), str(v))
+    dot.attr(label=rf'Δ = {delta}\nClass {1 if colours_used(G) == delta else 2}')
     return dot
 
 

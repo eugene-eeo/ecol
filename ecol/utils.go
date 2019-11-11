@@ -18,7 +18,7 @@ func WrapGraph(g *Graph) *ColouringGraph {
 		free:       nil,
 		uncoloured: uncoloured,
 	}
-	delta := max_degree(cg)
+	delta := max_degree(cg.g)
 	free := make([]*bitset.BitSet, g.n)
 	for i := 0; i < g.n; i++ {
 		free[i] = bitset.New(uint(delta + 2))
@@ -141,10 +141,10 @@ func switch_path(cg *ColouringGraph, path []int, alpha, beta int) {
 	}
 }
 
-func max_degree(cg *ColouringGraph) int {
+func max_degree(g *Graph) int {
 	max := 0
-	for i := 0; i < cg.g.n; i++ {
-		d := cg.g.Degree(i)
+	for i := 0; i < g.n; i++ {
+		d := g.Degree(i)
 		if d > max {
 			max = d
 		}
@@ -153,7 +153,7 @@ func max_degree(cg *ColouringGraph) int {
 }
 
 func colours_used(cg *ColouringGraph) int {
-	colours := bitset.New(uint(max_degree(cg)))
+	colours := bitset.New(uint(max_degree(cg.g)))
 	for _, e := range cg.g.Edges() {
 		colours.Set(uint(cg.Get(e.i, e.j)))
 	}

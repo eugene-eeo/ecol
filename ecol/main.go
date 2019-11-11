@@ -57,21 +57,22 @@ type ERBenchmark struct {
 }
 
 func main() {
-	for n := 0; n <= 200; n++ {
-		G := complete_graph(n)
-		vizing_heuristic(G)
-		if !validate_colouring(G) {
-			fmt.Println("FAIL", n)
-			break
-		}
-		H := complete_graph(n)
-		counting_heuristic_colour(H)
-		if !validate_colouring(H) {
-			fmt.Println("FAIL", n)
-			break
-		}
-	}
+	// for n := 0; n <= 200; n++ {
+	// 	G := complete_graph(n)
+	// 	vizing_heuristic(G)
+	// 	if !validate_colouring(G) {
+	// 		fmt.Println("FAIL", n)
+	// 		break
+	// 	}
+	// 	H := complete_graph(n)
+	// 	counting_heuristic_colour(H)
+	// 	if !validate_colouring(H) {
+	// 		fmt.Println("FAIL", n)
+	// 		break
+	// 	}
+	// }
 	// erdos_renyi_test()
+	graph_gen_task()
 }
 
 func erdos_renyi_test() {
@@ -117,7 +118,7 @@ func erdos_renyi_test() {
 				resultsChan <- ERBenchmark{
 					n:               n,
 					p:               p,
-					delta:           max_degree(g),
+					delta:           max_degree(g.g),
 					cg_colours_used: colours_used(g),
 					//cg_colours_used: colours_used(h),
 				}

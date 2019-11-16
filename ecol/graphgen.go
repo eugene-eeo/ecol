@@ -43,13 +43,30 @@ func graph_gen_task() {
 				k := param.k
 				n := param.n
 				G := param.Graph
-				cg := WrapGraph(G)
-				vizing_heuristic(cg)
-				is_class_one := colours_used(cg) == max_degree(G)
+				is_class_one := false
+				edge_data := G.edge_data
+				delta := max_degree(G)
+				// Try to prove class 1
+				for j := 0; j < 10 && !is_class_one; j++ {
+					gg := NewGraph(G.n)
+					G.CopyInto(gg)
+					cg := WrapGraph(gg)
+					vizing_heuristic(cg)
+					is_class_one = colours_used(cg) == delta
+					edge_data = gg.edge_data
+				}
+				if !is_class_one {
+					gg := NewGraph(G.n)
+					G.CopyInto(gg)
+					cg := WrapGraph(gg)
+					counting_heuristic_colour(cg)
+					is_class_one = colours_used(cg) == delta
+					edge_data = gg.edge_data
+				}
 				results <- GraphGenOutput{
 					K:        k,
 					N:        n,
-					EdgeData: G.edge_data,
+					EdgeData: edge_data,
 					ClassOne: is_class_one,
 				}
 			}

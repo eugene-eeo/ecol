@@ -174,3 +174,7 @@ func validate_colouring(cg *ColouringGraph) bool {
 	}
 	return true
 }
+
+func is_overfull(g *Graph) bool {
+	return g.EdgeCount() > max_degree(g)*(g.n/2)
+}

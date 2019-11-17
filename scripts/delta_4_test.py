@@ -6,8 +6,8 @@
 import sys
 import random
 import json
-from graph import Graph
-from utils import max_degree
+from pyecol.graph import Graph
+from pyecol.utils import max_degree
 
 
 def is_overfull(g: Graph) -> bool:

@@ -18,5 +18,6 @@ func main() {
 	// erdos_renyi_test()
 	// graph_gen_task()
 	// core_3_task()
-	delta_4_task()
+	// delta_4_task()
+	delta_5_task()
 }

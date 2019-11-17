@@ -158,3 +158,7 @@ def dmacs2graph(stream):
             _, u, v = line.split()
             g[int(u)-1, int(v)-1] = 0
     return g
+
+
+def is_overfull(g: Graph) -> bool:
+    return g.num_edges() > max_degree(g) * (g.n // 2)

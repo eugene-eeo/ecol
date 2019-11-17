@@ -1,6 +1,6 @@
 import graphviz
-from graph import Graph
 from itertools import cycle
+from .graph import Graph
 
 
 class ColouringGraph(Graph):
@@ -124,7 +124,8 @@ def plot_graph(G: Graph, with_labels=True):
             dot.edge(str(u), str(v), label=str(G[u, v]))
         else:
             dot.edge(str(u), str(v))
-    dot.attr(label=rf'Δ = {delta}\nClass {1 if colours_used(G) == delta else 2}')
+    graph_class = 1 if colours_used(G) == delta else 2
+    dot.attr(label=rf'Δ = {delta}\nClass {graph_class}')
     return dot
 
 

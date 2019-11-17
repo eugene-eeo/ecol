@@ -1,4 +1,4 @@
-from utils import max_degree, switch_path_containing, ColouringGraph
+from .utils import max_degree, switch_path_containing, ColouringGraph
 
 
 def rotate(G: ColouringGraph, v, W, colour):
@@ -28,7 +28,7 @@ def maximal_fan(G: ColouringGraph, X, Y):
     return F
 
 
-def misra_gries(G: ColouringGraph):
+def misra_gries(G: ColouringGraph) -> ColouringGraph:
     # see http://www.cs.utexas.edu/users/misra/psp.dir/vizing.pdf
     G.add_colours(set(range(1, max_degree(G) + 2)))  # Delta+1 colours
     for X, Y in G.edges():

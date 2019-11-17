@@ -1,8 +1,8 @@
 from functools import reduce
-from utils import ColouringGraph, max_degree, switch, get_path_subset
+from .utils import ColouringGraph, max_degree, switch, get_path_subset
 
 
-def counting_colour(G: ColouringGraph):
+def counting_colour(G: ColouringGraph) -> ColouringGraph:
     # https://arxiv.org/pdf/1901.01861.pdf
     delta = max_degree(G)
     # Allocate 1...delta+1 colours

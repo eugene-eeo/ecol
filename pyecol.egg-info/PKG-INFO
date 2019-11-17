@@ -1,0 +1,11 @@
+Metadata-Version: 1.2
+Name: pyecol
+Version: 0.1.0
+Summary: Edge colouring package
+Home-page: https://github.com/eugene-eeo/ecol
+Author: Eeo Jun
+Author-email: 141bytes@gmail.com
+License: UNKNOWN
+Description: UNKNOWN
+Platform: UNKNOWN
+Requires-Python: >=3.6

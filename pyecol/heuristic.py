@@ -1,4 +1,4 @@
-from utils import ColouringGraph, switch, get_path, max_degree
+from .utils import ColouringGraph, switch, get_path, max_degree
 
 
 def vizing_heuristic(G: ColouringGraph):

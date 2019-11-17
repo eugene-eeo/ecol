@@ -1,11 +1,11 @@
 from os import listdir
 from tabulate import tabulate
 
-from heuristic import vizing_heuristic
-from counting import counting_colour
-from misra_gries import misra_gries
-from utils import ColouringGraph, validate_colouring, colours_used, \
-        max_degree, dmacs2graph
+from pyecol.heuristic import vizing_heuristic
+from pyecol.counting import counting_colour
+from pyecol.misra_gries import misra_gries
+from pyecol.utils import ColouringGraph, validate_colouring, colours_used, \
+    max_degree, dmacs2graph
 
 
 def benchmark():
@@ -35,7 +35,7 @@ def benchmark():
                 colours_used(g),
                 colours_used(h),
                 colours_used(h2),
-                ))
+            ))
     data.sort()
     print(tabulate(data, headers=["Instance", "Δ", "ΔVh", "MG", "CB"]))
 

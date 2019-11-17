@@ -1,7 +1,7 @@
 import sys
 import random
 import json
-from graph import Graph, erdos_renyi_graph
+from graph import Graph
 from utils import max_degree
 
 

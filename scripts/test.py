@@ -1,8 +1,8 @@
-from graph import complete_graph, erdos_renyi_graph, complete_bipartite_graph
-from utils import validate_colouring, ColouringGraph
-from misra_gries import misra_gries
-from heuristic import vizing_heuristic
-from counting import counting_colour
+from pyecol.graph import complete_graph, erdos_renyi_graph, complete_bipartite_graph
+from pyecol.utils import validate_colouring, ColouringGraph
+from pyecol.misra_gries import misra_gries
+from pyecol.heuristic import vizing_heuristic
+from pyecol.counting import counting_colour
 
 
 def test_bipartite(f):

@@ -54,14 +54,14 @@ def generate_graph(n: int, delta: int = 4, attempts: int = 100) -> Graph:
 def main():
     for delta in [3, 4]:
         for n in range(5, 100):
-            for _ in range(100):
-                g = generate_graph(n, delta=delta, attempts=1000)
+            for _ in range(1000):
+                g = generate_graph(n, delta=delta, attempts=100)
                 if g is None or is_overfull(g):
                     continue
                 data = {
                     "n": n,
-                    "delta": delta,
                     "class": 1,
+                    "delta": max_degree(g),
                     "edge_data": [[(-1 if x is False else x) for x in row]
                                   for row in g.edge_data],
                 }

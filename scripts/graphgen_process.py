@@ -8,8 +8,8 @@ from pyecol.utils import plot_graph
 def main():
     for line in open(sys.argv[1]):
         z = json.loads(line)
-        if z["n"] < 30:
-            continue
+        # if z["n"] < 30:
+        #     continue
         c = dict(z)
         del c["edge_data"]
         pprint.pprint(c)

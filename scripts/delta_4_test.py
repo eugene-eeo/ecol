@@ -3,6 +3,7 @@
 #   $ python delta_4_test.py | ecol/ecol > x.csv
 #
 
+import itertools
 import argparse
 import json
 import random
@@ -14,11 +15,11 @@ from pyecol.utils import is_overfull
 def generate_base_graph(n: int, delta: int) -> (Graph, dict):
     g = Graph(n)
     deg = {u: 0 for u in range(n)}
-    for u in range(n):
+    for u, row in enumerate(g.edge_data):
         if deg[u] == delta:
             continue
-        peers = {v for v in range(n)
-                 if deg[v] < delta and g.edge_data[u][v] is False and v != u}
+        peers = {v for v, d in deg.items()
+                 if d < delta and row[v] is False and v != u}
         num_peers = min(len(peers), delta - deg[u])
         if num_peers > 0:
             peers = random.sample(peers, random.randint(0, num_peers))
@@ -58,6 +59,18 @@ def generate_graph(n: int, delta: int = 4, attempts: int = 100) -> Graph:
     return None
 
 
+def contains_k5e(g: Graph):
+    '''Check if the graph contains K_5 - e as a subgraph'''
+    neighbours = {u: set(g.neighbours(u)) for u in range(g.n)}
+    for subset in itertools.combinations(g.nodes(), 5):
+        subset = set(subset)
+        degs = [len(neighbours[u] & subset) for u in subset]
+        degs.sort()
+        if degs == [3, 3, 4, 4, 4]:
+            return True
+    return False
+
+
 def main():
     parser = argparse.ArgumentParser(description='Generate graphs with bounded delta and core with max degree 2.')
     parser.add_argument('--delta', dest='delta', type=int, default=4)
@@ -65,14 +78,17 @@ def main():
     parser.add_argument('--start', dest='start', type=int, default=5)
     parser.add_argument('--end', dest='end', type=int, default=100)
     parser.add_argument('--step', dest='step', type=int, default=1)
+    parser.add_argument('--contains-k5e', dest='contains_k5e', type=bool, default=False)
 
     args = parser.parse_args()
     delta = args.delta
 
     for n in range(args.start, args.end, args.step):
         for _ in range(args.repeats):
-            g = generate_graph(n, delta=delta, attempts=100)
+            g = generate_graph(n, delta=delta, attempts=1000)
             if g is None:
+                continue
+            if args.contains_k5e and not contains_k5e(g):
                 continue
             data = {
                 "n": n,

@@ -2,6 +2,7 @@
 /*.gv
 misc/*.lyx~
 /*.csv
+/*.jsonl
 *.csv
 ecol/ecol
 *.json

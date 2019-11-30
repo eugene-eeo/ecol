@@ -22,6 +22,7 @@ type Delta5Output struct {
 	Delta    int     `json:"delta"`
 	Class    int     `json:"class"`
 	EdgeData [][]int `json:"edge_data"`
+	CoreSize int     `json:"core_size"`
 }
 
 func delta_5_task() {
@@ -62,6 +63,7 @@ func delta_5_task() {
 						Delta:    param.Delta,
 						EdgeData: edge_data,
 						Class:    class,
+						CoreSize: core_size(G),
 					}
 				}
 			}
@@ -74,6 +76,7 @@ func delta_5_task() {
 		enc := json.NewEncoder(w)
 		for result := range results {
 			enc.Encode(result)
+			w.Flush()
 		}
 		rg.Done()
 	}()
@@ -87,6 +90,14 @@ func delta_5_task() {
 		}
 		G := NewGraph(len(p.EdgeData))
 		G.edge_data = p.EdgeData
+		// Clear edge data
+		for i := 0; i < G.n; i++ {
+			for j := 0; j < G.n; j++ {
+				if G.edge_data[i][j] != -1 {
+					G.edge_data[i][j] = 0
+				}
+			}
+		}
 		params <- Delta5Param{
 			Delta: p.Delta,
 			N:     p.N,

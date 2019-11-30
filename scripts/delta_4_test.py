@@ -30,14 +30,16 @@ def generate_base_graph(n: int, delta: int) -> (Graph, dict):
     return g, deg
 
 
-def is_connected(G: Graph, core: set):
+def is_semicore(G: Graph, core: set):
+    # Check if a graph is a valid semicore (all nodes are connected to
+    # a core node)
     for u in set(G.nodes()) - core:
         if not core & set(G.neighbours(u)):
             return False
     return True
 
 
-def generate_graph(n: int, delta: int = 4, attempts: int = 100) -> Graph:
+def generate_graph(n: int, delta: int = 4, attempts: int = 100, delta_core=2, checks=[]) -> Graph:
     # Core has delta <= 2
     # G has delta <= 4
     # n = total # of vertices
@@ -51,18 +53,29 @@ def generate_graph(n: int, delta: int = 4, attempts: int = 100) -> Graph:
             for u in core
         )
         if g_delta != delta \
-                or core_max_degree > 2 \
+                or core_max_degree > delta_core \
                 or is_overfull(g) \
-                or not is_connected(g, core):
+                or not all(f(g, core) for f in checks) \
+                or not is_semicore(g, core):
             continue
         return g
     return None
 
 
-def contains_k5e(g: Graph):
+def core_is_complete(g: Graph, core: set):
+    '''Check if the graph core is complete'''
+    for u in core:
+        for v in core:
+            if u != v and g.edge_data[u][v] is False:
+                return False
+    return True
+
+
+def contains_k5e(g: Graph, core: set):
     '''Check if the graph contains K_5 - e as a subgraph'''
     neighbours = {u: set(g.neighbours(u)) for u in range(g.n)}
-    for subset in itertools.combinations(g.nodes(), 5):
+    candidates = [u for u in neighbours if len(neighbours[u]) >= 3]
+    for subset in itertools.combinations(candidates, 5):
         subset = set(subset)
         degs = [len(neighbours[u] & subset) for u in subset]
         degs.sort()
@@ -72,23 +85,39 @@ def contains_k5e(g: Graph):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Generate graphs with bounded delta and core with max degree 2.')
-    parser.add_argument('--delta', dest='delta', type=int, default=4)
+    parser = argparse.ArgumentParser(description='Generate graphs with bounded overall and core delta.')
+    parser.add_argument('--delta', dest='delta', type=int, required=True)
+    parser.add_argument('--delta-core', dest='delta_core', type=int, required=True)
+
     parser.add_argument('--repeats', dest='repeats', type=int, default=1000)
+    parser.add_argument('--attempts', dest='attempts', type=int, default=1000)
     parser.add_argument('--start', dest='start', type=int, default=5)
-    parser.add_argument('--end', dest='end', type=int, default=100)
+    parser.add_argument('--end', dest='end', type=int, default=20)
     parser.add_argument('--step', dest='step', type=int, default=1)
-    parser.add_argument('--contains-k5e', dest='contains_k5e', type=bool, default=False)
+
+    # Checks
+    parser.add_argument('--contains-k5e', dest='contains_k5e', action='store_true', default=False)
+    parser.add_argument('--complete-core', dest='complete_core', action='store_true', default=False)
 
     args = parser.parse_args()
     delta = args.delta
 
-    for n in range(args.start, args.end, args.step):
-        for _ in range(args.repeats):
-            g = generate_graph(n, delta=delta, attempts=1000)
+    checks = []
+    if args.contains_k5e:
+        checks.append(contains_k5e)
+    if args.complete_core:
+        checks.append(core_is_complete)
+
+    for n in range(args.start, args.end + 1, args.step):
+        for i in range(args.repeats):
+            g = generate_graph(
+                n, delta=delta,
+                attempts=args.attempts,
+                checks=checks,
+                delta_core=args.delta_core,
+            )
+            # sys.stderr.write(f"[{n}] {i} ok={g is not None}\n")
             if g is None:
-                continue
-            if args.contains_k5e and not contains_k5e(g):
                 continue
             data = {
                 "n": n,
@@ -99,6 +128,7 @@ def main():
             }
             json.dump(data, sys.stdout)
             sys.stdout.write("\n")
+            sys.stdout.flush()
 
 
 if __name__ == '__main__':

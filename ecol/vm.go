@@ -59,8 +59,8 @@ OUTER:
 			graph.CopyInto(g)
 			cg := WrapGraph(g)
 			algorithm(cg)
+			edge_data = cg.g.edge_data
 			if colours_used(cg) == delta {
-				edge_data = cg.g.edge_data
 				class = 1
 				break OUTER
 			}

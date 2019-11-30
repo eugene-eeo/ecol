@@ -160,15 +160,15 @@ func colours_used(cg *ColouringGraph) int {
 	return int(colours.Count())
 }
 
-func validate_colouring(cg *ColouringGraph) bool {
-	for i := 0; i < cg.g.n; i++ {
+func validate_colouring(g *Graph) bool {
+	for i := 0; i < g.n; i++ {
 		x := bitset.New(0)
-		for j := 0; j < cg.g.n; j++ {
-			if i != j && cg.g.edge_data[i][j] != -1 {
-				x.Set(uint(cg.g.edge_data[i][j]))
+		for j := 0; j < g.n; j++ {
+			if i != j && g.edge_data[i][j] != -1 {
+				x.Set(uint(g.edge_data[i][j]))
 			}
 		}
-		if x.Count() != uint(cg.g.Degree(i)) {
+		if x.Count() != uint(g.Degree(i)) {
 			return false
 		}
 	}

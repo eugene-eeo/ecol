@@ -21,6 +21,7 @@ func main() {
 	attempts := flag.Int("attempts", 20, "number of attempts")
 	use_vh := flag.Bool("use-vh", true, "use vizing heuristic")
 	use_ch := flag.Bool("use-ch", true, "use counting heuristic")
+	use_bf := flag.Bool("use-bf", false, "use brute force")
 	emit_class_one := flag.Bool("emit-class-one", false, "emit class one graphs")
 	flag.Parse()
 
@@ -29,7 +30,11 @@ func main() {
 		Attempts:     *attempts,
 		UseVH:        *use_vh,
 		UseCH:        *use_ch,
+		UseBF:        *use_bf,
 		EmitClassOne: *emit_class_one,
+	}
+	if config.UseBF {
+		config.Attempts = 1
 	}
 	vm_perform(&config)
 }

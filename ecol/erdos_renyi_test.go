@@ -113,7 +113,7 @@ func erdos_renyi_test() {
 					cg_colours_used: colours_used(g),
 					//cg_colours_used: colours_used(h),
 				}
-				if !validate_colouring(g) {
+				if !validate_colouring(g.g) {
 					fmt.Println("FAIL")
 				}
 			}

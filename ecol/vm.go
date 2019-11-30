@@ -17,7 +17,13 @@ func (vc VMInput) EdgeData() [][]int {
 	for i, row := range edg {
 		edge_data[i] = make([]int, len(edg))
 		for j, x := range row.([]interface{}) {
-			edge_data[i][j] = int(x.(float64))
+			// So we can chain multiple results together; we remove all the colouring info
+			// and keep just the relevant parts
+			v := int(x.(float64))
+			if v != -1 {
+				v = 0
+			}
+			edge_data[i][j] = v
 		}
 	}
 	return edge_data
@@ -28,6 +34,7 @@ type VMConfig struct {
 	Attempts     int
 	UseVH        bool
 	UseCH        bool
+	UseBF        bool
 	EmitClassOne bool
 }
 
@@ -38,6 +45,9 @@ func (vc *VMConfig) Algorithms() []func(*ColouringGraph) {
 	}
 	if vc.UseCH {
 		algos = append(algos, counting_heuristic_colour)
+	}
+	if vc.UseBF {
+		algos = append(algos, brute_force_colour)
 	}
 	return algos
 }

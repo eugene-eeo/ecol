@@ -1,15 +1,16 @@
 # Inteded usage:
 #
-#   $ python gen_nx.py | ecol/ecol > x.csv
+#   $ python gen_nx.py ... | python graphcheck.py ...
 #
 
 import argparse
-import itertools
 import json
+import random
 import sys
 
 import networkx as nx
 from pyecol.graph import Graph
+from pyecol.utils import is_overfull
 
 
 def nx2graph(G: nx.Graph):
@@ -19,16 +20,20 @@ def nx2graph(G: nx.Graph):
     return g
 
 
-def generate_graphs(delta, n, repeats=1000):
+def generate_graphs(delta, n, repeats=1000, underfull=True):
     r = [delta - 1, delta]
-    for seq in itertools.product(r, repeat=n):
+    for _ in range(repeats):
+        seq = [delta] + [random.choice(r) for _ in range(n-1)]
         if not nx.is_graphical(seq):
             continue
-        for _ in range(repeats):
-            try:
-                yield nx2graph(nx.random_degree_sequence_graph(seq))
-            except nx.NetworkXException:
-                pass
+        try:
+            g = nx2graph(nx.random_degree_sequence_graph(seq))
+            if is_overfull(g) != underfull:
+                yield g
+        except nx.NetworkXUnfeasible:
+            pass
+        except nx.NetworkXException:
+            pass
 
 
 def main():
@@ -40,6 +45,7 @@ def main():
     parser.add_argument('--start', dest='start', type=int, default=5)
     parser.add_argument('--end', dest='end', type=int, default=20)
     parser.add_argument('--step', dest='step', type=int, default=1)
+    parser.add_argument('--repeats', dest='repeats', type=int, default=1000)
 
     args = parser.parse_args()
     delta = args.delta
@@ -49,6 +55,7 @@ def main():
             delta=delta,
             n=n,
             underfull=args.underfull,
+            repeats=args.repeats,
         )
         for g in it:
             data = {

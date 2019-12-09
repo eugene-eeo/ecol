@@ -108,7 +108,8 @@ def plot_graph(G: Graph, with_labels=True):
 
     delta = max_degree(G)
     nodes = set(G.nodes())
-    core = {x for x in nodes if G.degree(x) == delta}
+    degrees = {x: G.degree(x) for x in G.nodes()}
+    core = {x for x in degrees if degrees[x] == delta}
 
     with dot.subgraph() as s:
         s.attr(rank='same')
@@ -125,7 +126,8 @@ def plot_graph(G: Graph, with_labels=True):
         else:
             dot.edge(str(u), str(v))
     graph_class = 1 if colours_used(G) == delta else 2
-    dot.attr(label=rf'Δ = {delta}\nClass {graph_class}')
+    deg_seq = sorted(degrees.values())
+    dot.attr(label=rf'Δ = {delta}\nClass {graph_class}\n{deg_seq}')
     return dot
 
 
@@ -162,3 +164,34 @@ def dmacs2graph(stream):
 
 def is_overfull(g: Graph) -> bool:
     return g.num_edges() > max_degree(g) * (g.n // 2)
+
+
+def contains_cycle(g: Graph, subset=None):
+    subset = subset if subset is not None else set(g.nodes())
+
+    # A recursive function that uses visited[] and parent to detect
+    # cycle in subgraph reachable from vertex v.
+    def isCyclicUtil(v, visited, parent):
+
+        # Mark the current node as visited
+        visited[v] = True
+
+        # Recur for all the vertices adjacent to this vertex
+        for i in subset & set(g.neighbours(v)):
+            # If the node is not visited then recurse on it
+            if not visited[i]:
+                if isCyclicUtil(i, visited, v):
+                    return True
+            # If an adjacent vertex is visited and not parent of current vertex,
+            # then there is a cycle
+            elif parent != i:
+                return True
+
+        return False
+
+    visited = {x: False for x in subset}
+    for i in subset:
+        if not visited[i]:
+            if isCyclicUtil(i, visited, -1):
+                return True
+    return False

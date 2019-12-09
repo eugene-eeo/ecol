@@ -1,6 +1,5 @@
 package main
 
-import "fmt"
 import "github.com/willf/bitset"
 
 func unique_values(p []int) int {
@@ -61,9 +60,6 @@ func brute_force_colour(cg *ColouringGraph) {
 	adjList := build_adj_list(edges)
 	n := graph.EdgeCount()
 
-	fmt.Println(delta + 1)
-	fmt.Println(n)
-
 	best_num := delta + 2
 	best_col := make([]int, n)
 
@@ -72,7 +68,6 @@ OUTER:
 		for idx, edge := range edges {
 			graph.Set(edge.i, edge.j, p[idx]+1)
 		}
-		fmt.Println(p)
 		if fast_valid_edge_colouring(graph, adjList) {
 			num := unique_values(p)
 			if num < best_num {

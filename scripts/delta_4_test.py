@@ -22,10 +22,11 @@ def generate_base_graph(n: int, delta: int) -> (Graph, dict):
                  if d < delta and row[v] is False and v != u}
         num_peers = min(len(peers), delta - deg[u])
         if num_peers > 0:
-            peers = random.sample(peers, random.randint(0, num_peers))
+            num = random.randint(0, num_peers)
+            peers = random.sample(peers, num)
+            deg[u] += num
             for v in peers:
                 g[u, v] = 0
-                deg[u] += 1
                 deg[v] += 1
     return g, deg
 
@@ -71,6 +72,21 @@ def core_is_complete(g: Graph, core: set):
     return True
 
 
+def contains_k5(g: Graph, core: set):
+    '''Check if the graph contains K_5 as a subgraph'''
+    neighbours = {u: set(g.neighbours(u)) for u in range(g.n)}
+    candidates = [u for u in neighbours if len(neighbours[u]) >= 4]
+    for subset in itertools.combinations(candidates, 5):
+        subset = set(subset)
+        if all(len(neighbours[u] & subset) == 4 for u in subset):
+            return True
+    return False
+
+
+def core_4(g: Graph, core: set):
+    return len(core) > 4
+
+
 def contains_k5e(g: Graph, core: set):
     '''Check if the graph contains K_5 - e as a subgraph'''
     neighbours = {u: set(g.neighbours(u)) for u in range(g.n)}
@@ -96,6 +112,8 @@ def main():
     parser.add_argument('--step', dest='step', type=int, default=1)
 
     # Checks
+    parser.add_argument('--core-4', dest='core_4', action='store_true', default=False)
+    parser.add_argument('--contains-k5', dest='contains_k5', action='store_true', default=False)
     parser.add_argument('--contains-k5e', dest='contains_k5e', action='store_true', default=False)
     parser.add_argument('--complete-core', dest='complete_core', action='store_true', default=False)
 
@@ -103,6 +121,10 @@ def main():
     delta = args.delta
 
     checks = []
+    if args.core_4:
+        checks.append(core_4)
+    if args.contains_k5:
+        checks.append(contains_k5)
     if args.contains_k5e:
         checks.append(contains_k5e)
     if args.complete_core:
@@ -121,7 +143,6 @@ def main():
                 continue
             data = {
                 "n": n,
-                "class": 1,
                 "delta": delta,
                 "edge_data": [[(-1 if x is False else x) for x in row]
                               for row in g.edge_data],

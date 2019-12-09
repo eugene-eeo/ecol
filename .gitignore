@@ -7,3 +7,4 @@ misc/*.lyx~
 *.csv
 ecol/ecol
 *.json
+/plots/

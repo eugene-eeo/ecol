@@ -20,9 +20,9 @@ def run_command(n, delta, underfull=True):
         mine = delta * int(n // 2) + 1
         maxe = 0
 
-    print(f'geng -c -q -d{delta-1} -D{delta} {n} {mine}:{maxe}', file=sys.stderr)
+    print(f'geng -cq -d{delta-1} -D{delta} {n} {mine}:{maxe}', file=sys.stderr)
     proc = subprocess.Popen(
-        f'geng -c -q -d{delta-1} -D{delta} {n} {mine}:{maxe} | showg -a',
+        f'geng -cq -d{delta-1} -D{delta} {n} {mine}:{maxe} | showg -a',
         shell=True,
         env={"PATH": "/home/eeojun/Downloads/nauty26r12/"},
         stdout=subprocess.PIPE,

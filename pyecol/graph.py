@@ -48,6 +48,20 @@ class Graph:
             if data is not False:
                 yield i
 
+    def subgraph(self, nodes):
+        nl = list(nodes)
+        ns = set(nl)
+        g = Graph(len(ns))
+        for u, v in self.edges():
+            if u in ns and v in ns:
+                i = nl.index(u)
+                j = nl.index(v)
+                g[i, j] = self[u, v]
+        return g
+
+    def degrees(self):
+        return {u: self.degree(u) for u in self.nodes()}
+
 
 def complete_graph(k):
     g = Graph(k)

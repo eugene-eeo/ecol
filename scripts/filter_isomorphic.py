@@ -1,6 +1,7 @@
 import sys
 import json
 import networkx as nx
+from collections import deque
 from pyecol.graph import Graph
 
 
@@ -13,14 +14,19 @@ def golang_graph2graph(edge_data) -> nx.Graph:
 
 
 def filter_isomorphic(graphs):
-    prev = None
+    MAX = 500
+    prevs = deque(maxlen=MAX)
     for data, graph in graphs:
         # otherwise perform checks
-        if (prev is not None
-                and nx.fast_could_be_isomorphic(graph, prev)
-                and nx.is_isomorphic(graph, prev)):
+        found = any(
+            nx.fast_could_be_isomorphic(graph, g) and nx.is_isomorphic(graph, g)
+            for g in prevs
+        )
+        if found:
             continue
-        prev = graph
+        prevs.append(graph)
+        if len(prevs) > MAX:
+            prevs.popleft()
         yield data
 
 

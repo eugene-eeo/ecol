@@ -9,21 +9,18 @@ def main():
         z = json.loads(line)
         g = Graph(len(z["edge_data"]))
 
-        # if g.n != 9:
+        # if g.n != 8:
         #     continue
 
         g.edge_data = [[(x if x != -1 else False) for x in row] for row in z["edge_data"]]
         seq = list(g.degrees().values())
         seq.sort()
 
-        if seq != [g.n - 1] * g.n:
-            continue
-
-        # if seq != [5, 5, 5, 5, 6, 6, 6, 6, 6]:
+        # if seq != [g.n - 1] * g.n:
         #     continue
 
         plot_graph(g, with_labels=False).render(
-            filename=f"rr/{sys.argv[1]}.{i}",
+            filename=f"r2/{sys.argv[1]}.{g.n}.{i}",
             cleanup=True,
         )
 

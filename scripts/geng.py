@@ -17,6 +17,7 @@ def run_command(n, delta, min_delta, underfull=True):
     mine = None
     maxe = None
     if delta is not None:
+        # We cannot calculate a overfull/underfull mine/maxe without delta!
         template = 'geng -cq -d{min_delta} -D{delta} {n} {mine}:{maxe} | showg -a'
         if underfull:
             mine = 0
@@ -47,7 +48,7 @@ def run_command(n, delta, min_delta, underfull=True):
         yield line.decode('ascii')
 
 
-def adj_mat_to_graph(lines, n, underfull=False, **kwargs):
+def adj_mat_to_graph(lines, n, underfull=None):
     while True:
         line = next(lines, "")
         if not line:
@@ -59,45 +60,44 @@ def adj_mat_to_graph(lines, n, underfull=False, **kwargs):
                 mat.append(line.strip())
             g = Graph(n)
             g.edge_data = [[False if x == '0' else 0 for x in row] for row in mat]
-            if is_overfull(g) != underfull:
+            if underfull is None or is_overfull(g) == (not underfull):
                 yield g
 
 
-def generate_graphs(delta, n, **kwargs):
-    return adj_mat_to_graph(run_command(n, delta, **kwargs), n, **kwargs)
+def generate_graphs(args):
+    if args.min_delta is None:
+        args.min_delta = args.delta - 1 if (args.delta is not None) else 1
+    for n in range(args.start, args.end + 1, args.step):
+        yield from adj_mat_to_graph(
+            run_command(n=n, delta=args.delta, min_delta=args.min_delta, underfull=args.underfull),
+            n=n,
+            underfull=args.underfull,
+        )
 
 
 def main():
     parser = argparse.ArgumentParser(description='Generate graphs with bounded overall and core delta.')
     parser.add_argument('--delta', dest='delta', type=int, required=False, default=None)
     parser.add_argument('--min-delta', dest='min_delta', type=int, required=False, default=None)
-    parser.add_argument('--overfull', dest='underfull', action='store_false', required=False, default=True)
+
+    parser.add_argument('--underfull', dest='underfull', action='store_true', required=False, default=None)
+    parser.add_argument('--overfull', dest='underfull', action='store_false', required=False)
 
     parser.add_argument('--start', dest='start', type=int, default=5)
-    parser.add_argument('--end', dest='end', type=int, default=20)
+    parser.add_argument('--end', dest='end', type=int, default=13)
     parser.add_argument('--step', dest='step', type=int, default=1)
 
     args = parser.parse_args()
-    delta = args.delta
-    min_delta = delta - 1 if (args.delta is not None and args.min_delta is None) else 1
-
-    for n in range(args.start, args.end + 1, args.step):
-        it = generate_graphs(
-            delta=delta,
-            min_delta=min_delta,
-            n=n,
-            underfull=args.underfull,
-        )
-        for g in it:
-            data = {
-                "n": n,
-                "delta": max(g.degrees().values()),
-                "edge_data": [[(-1 if x is False else x) for x in row]
-                              for row in g.edge_data],
-            }
-            json.dump(data, sys.stdout)
-            sys.stdout.write("\n")
-            sys.stdout.flush()
+    for g in generate_graphs(args):
+        data = {
+            "n": g.n,
+            "delta": max(g.degrees().values()),
+            "edge_data": [[(-1 if x is False else x) for x in row]
+                          for row in g.edge_data],
+        }
+        json.dump(data, sys.stdout)
+        sys.stdout.write("\n")
+        sys.stdout.flush()
 
 
 if __name__ == '__main__':

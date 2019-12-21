@@ -14,7 +14,7 @@ def golang_graph2graph(edge_data) -> nx.Graph:
 
 
 def filter_isomorphic(graphs):
-    MAX = 500
+    MAX = 2000
     prevs = deque(maxlen=MAX)
     for data, graph in graphs:
         # otherwise perform checks
@@ -24,9 +24,9 @@ def filter_isomorphic(graphs):
         )
         if found:
             continue
-        prevs.append(graph)
-        if len(prevs) > MAX:
+        if len(prevs) == MAX:
             prevs.popleft()
+        prevs.append(graph)
         yield data
 
 

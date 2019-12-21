@@ -1,3 +1,9 @@
+# check_is.py
+#
+# Needs to be ran in the root directory on system python3 with
+# graph_tool installed (since there is no graph_tool on pip...).
+
+
 from bisect import bisect_left
 from collections import defaultdict
 import json

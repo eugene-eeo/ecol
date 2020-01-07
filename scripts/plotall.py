@@ -1,11 +1,19 @@
 import json
-import sys
+import argparse
 from pyecol.graph import Graph
 from pyecol.utils import plot_graph
 
 
 def main():
-    for i, line in enumerate(open(sys.argv[1])):
+    parser = argparse.ArgumentParser()
+    parser.add_argument('file', type=str)
+    parser.add_argument('-d', '--dir', type=str, default='.', required=False)
+    parser.add_argument('-p', '--prefix', type=str, default=None, required=False)
+
+    args = parser.parse_args()
+    args.prefix = args.file if args.prefix is None else args.prefix
+
+    for i, line in enumerate(open(args.file)):
         z = json.loads(line)
         g = Graph(len(z["edge_data"]))
 
@@ -20,7 +28,7 @@ def main():
         #     continue
 
         plot_graph(g, with_labels=False).render(
-            filename=f"r2/{sys.argv[1]}.{g.n}.{i}",
+            filename=f"{args.dir}/{args.prefix}.{g.n}.{i}",
             cleanup=True,
         )
 

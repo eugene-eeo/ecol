@@ -2,12 +2,11 @@ import sys
 import json
 import networkx as nx
 from collections import deque
-from pyecol.graph import Graph
+from pyecol.utils import golang_graph_to_graph
 
 
 def golang_graph2graph(edge_data) -> nx.Graph:
-    g = Graph(len(edge_data))
-    g.edge_data = [[(False if x == -1 else 0) for x in row] for row in edge_data]
+    g = golang_graph_to_graph(edge_data)
     G = nx.Graph()
     G.add_edges_from(g.edges())
     return G

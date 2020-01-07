@@ -195,3 +195,21 @@ def contains_cycle(g: Graph, subset=None):
             if isCyclicUtil(i, visited, -1):
                 return True
     return False
+
+
+def golang_graph_to_graph(edge_data) -> Graph:
+    """
+    Convert golang graph to pyecol graph.
+    Go implementation uses -1 for no-edge instead of False.
+    """
+    g = Graph(len(edge_data))
+    g.edge_data = [[(False if x == -1 else 0) for x in row] for row in edge_data]
+    return g
+
+
+def graph_to_golang_graph(g: Graph) -> list:
+    """
+    Convert from pyecol graph to golang graph.
+    Go implementation uses -1 for no-edge instead of False.
+    """
+    return [[(-1 if x is False else x) for x in row] for row in g.edge_data]

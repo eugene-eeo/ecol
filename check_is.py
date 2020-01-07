@@ -36,14 +36,11 @@ def index(a, x):
 
 
 def is_sublist(a, b):
-    fst = a[0]
-    n = len(a)
-    first_index = index(b, fst)
+    first_index = index(b, a[0])
     if first_index == -1:
         return False
+    n = len(a)
     for i in range(first_index, len(b) - 1):
-        if b[i] != fst:
-            break
         if a == b[i:i+n]:
             return True
     return False
@@ -57,6 +54,14 @@ def check_degseq(g, G, degseq, cores):
     return False
 
 
+def check_induced(g, G, degseq, cores):
+    for m in range(min(cores), g.n):
+        for _, sub, _ in cores[m]:
+            if subgraph_isomorphism(sub=sub, g=G, max_n=1, induced=True):
+                return True
+    return False
+
+
 def main():
     cores = defaultdict(list)
     for i, line in enumerate(open(sys.argv[1])):
@@ -66,15 +71,8 @@ def main():
 
     for n in sorted(cores)[1:]:
         for i, (g, G, degseq) in enumerate(cores[n], 1):
-
-            print(n, i, file=sys.stderr)
-
-            if not any(subgraph_isomorphism(
-                sub=sub,
-                g=G,
-                max_n=1,
-                induced=True,
-            ) for _, sub, _ in cores[n-1]) and not check_degseq(g, G, degseq, cores):
+            if not check_induced(g, G, degseq, cores):
+                # print(n, i, file=sys.stderr)
                 edge_data = [[-1 if x is False else x for x in row] for row in g.edge_data]
                 data = {
                     "n": g.n,
@@ -82,7 +80,6 @@ def main():
                 }
                 json.dump(data, sys.stdout)
                 sys.stdout.write("\n")
-                sys.stdout.flush()
 
 
 if __name__ == '__main__':

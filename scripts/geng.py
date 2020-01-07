@@ -9,7 +9,7 @@ import sys
 import subprocess
 
 from pyecol.graph import Graph
-from pyecol.utils import is_overfull
+from pyecol.utils import is_overfull, graph_to_golang_graph
 
 
 def run_command(n, delta, min_delta, underfull=True):
@@ -92,8 +92,7 @@ def main():
         data = {
             "n": g.n,
             "delta": max(g.degrees().values()),
-            "edge_data": [[(-1 if x is False else x) for x in row]
-                          for row in g.edge_data],
+            "edge_data": graph_to_golang_graph(g),
         }
         json.dump(data, sys.stdout)
         sys.stdout.write("\n")

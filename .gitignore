@@ -8,3 +8,5 @@ misc/*.lyx~
 ecol/ecol
 *.json
 /plots/
+/bad_cores_induced/
+/bad_cores_non_induced/

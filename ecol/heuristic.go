@@ -32,7 +32,6 @@ func vizing_heuristic(cg *ColouringGraph) {
 			cg.Set(w, v_0, int(colour))
 			taboo = 0
 		} else {
-
 			// Check if free[v_0] has some colour != taboo
 			cg.free[v_0].Copy(S)
 			S.SetTo(taboo, false)

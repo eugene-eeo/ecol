@@ -1,5 +1,6 @@
 package main
 
+import "bufio"
 import "sync"
 import "os"
 import "encoding/json"
@@ -17,7 +18,7 @@ func (vc VMInput) EdgeData() [][]int {
 	for i, row := range edg {
 		edge_data[i] = make([]int, len(edg))
 		for j, x := range row.([]interface{}) {
-			// So we can chain multiple results together; we remove all the colouring info
+			// So we can chain multiple ecol outputs together; we remove all the colouring info
 			// and keep just the relevant parts
 			v := int(x.(float64))
 			if v != -1 {
@@ -115,10 +116,12 @@ func vm_perform(config *VMConfig) {
 
 	// Spawn writer
 	go func() {
-		encoder := json.NewEncoder(os.Stdout)
+		w := bufio.NewWriter(os.Stdout)
+		encoder := json.NewEncoder(w)
 		for output := range resultsChan {
 			encoder.Encode(output)
 		}
+		w.Flush()
 		writerWg.Done()
 	}()
 

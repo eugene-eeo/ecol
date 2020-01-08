@@ -1,20 +1,20 @@
 import sys
 import json
-from pyecol.graph import Graph
+from pyecol.utils import golang_graph_to_graph, graph_to_golang_graph
 
 
 def main():
     for line in sys.stdin:
+        line = line.strip()
         data = json.loads(line)
         edge_data = data["edge_data"]
-        g = Graph(len(edge_data))
-        g.edge_data = [[(False if x == -1 else 0) for x in row] for row in edge_data]
 
+        g = golang_graph_to_graph(edge_data)
         deg = g.degrees()
         delta = max(deg.values())
 
         h = g.subgraph([u for u in g.nodes() if deg[u] == delta])
-        data["edge_data"] = [[(-1 if x is False else x) for x in row] for row in h.edge_data]
+        data["edge_data"] = graph_to_golang_graph(h)
 
         json.dump(data, sys.stdout)
         sys.stdout.write("\n")

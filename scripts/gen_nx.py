@@ -5,12 +5,12 @@
 
 import argparse
 import json
-import random
 import sys
+import random
 
 import networkx as nx
 from pyecol.graph import Graph
-from pyecol.utils import is_overfull
+from pyecol.utils import is_overfull, graph_to_golang_graph
 
 
 def nx2graph(G: nx.Graph):
@@ -45,10 +45,11 @@ def main():
     parser.add_argument('--start', dest='start', type=int, default=5)
     parser.add_argument('--end', dest='end', type=int, default=20)
     parser.add_argument('--step', dest='step', type=int, default=1)
-    parser.add_argument('--repeats', dest='repeats', type=int, default=1000)
+    parser.add_argument('--repeats', dest='repeats', type=int, default=10000)
 
     args = parser.parse_args()
     delta = args.delta
+    print("Parameters: start=%d, end=%d, repeats=%d, underfull=%r" % (args.start, args.end, args.repeats, args.underfull), file=sys.stderr)
 
     for n in range(args.start, args.end + 1, args.step):
         it = generate_graphs(
@@ -59,14 +60,11 @@ def main():
         )
         for g in it:
             data = {
-                "n": n,
+                "n": g.n,
                 "delta": delta,
-                "edge_data": [[(-1 if x is False else x) for x in row]
-                              for row in g.edge_data],
+                "edge_data": graph_to_golang_graph(g),
             }
-            json.dump(data, sys.stdout)
-            sys.stdout.write("\n")
-            sys.stdout.flush()
+            print(json.dumps(data))
 
 
 if __name__ == '__main__':

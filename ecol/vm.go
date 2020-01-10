@@ -4,6 +4,7 @@ import "bufio"
 import "sync"
 import "os"
 import "encoding/json"
+import "os/signal"
 
 // Expect edge_data in this input
 type VMInput map[string]interface{}
@@ -114,15 +115,29 @@ func vm_perform(config *VMConfig) {
 		}()
 	}
 
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+
 	// Spawn writer
 	go func() {
 		w := bufio.NewWriter(os.Stdout)
-		defer w.Flush()
 		encoder := json.NewEncoder(w)
-		for output := range resultsChan {
-			encoder.Encode(output)
+		shouldContinue := true
+		for shouldContinue {
+			select {
+			case output, ok := <-resultsChan:
+				shouldContinue = ok
+				if ok {
+					encoder.Encode(output)
+				}
+			// Wait for interrupt, just flush all output
+			case <-c:
+				w.Flush()
+				os.Exit(1)
+			}
 		}
 		writerWg.Done()
+		w.Flush()
 	}()
 
 	decoder := json.NewDecoder(os.Stdin)

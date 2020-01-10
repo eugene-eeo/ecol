@@ -1,3 +1,8 @@
+// Implements a heuristic version of the counting based algorithm
+// that initially tries to colour with delta colours, but restarts
+// with delta + 1 whenever we run out of colours to use. This is
+// similar to the vh_heuristic algorithm.
+
 package main
 
 import "github.com/willf/bitset"

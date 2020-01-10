@@ -3,9 +3,9 @@
 #   $ python geng_raw.py | ecol/ecol -gc
 #
 
+import os
 import argparse
 import sys
-import subprocess
 
 
 def run_command(n, delta, min_delta, underfull):
@@ -34,14 +34,7 @@ def run_command(n, delta, min_delta, underfull):
         n=n,
     )
     print(cmd, file=sys.stderr)
-    proc = subprocess.Popen(
-        cmd,
-        shell=True,
-        env={"PATH": "/home/eeojun/Downloads/nauty26r12/"},
-        stdout=sys.stdout,
-        stderr=sys.stderr,
-    )
-    proc.wait()
+    os.system(cmd)
 
 
 def generate_graphs(args):
@@ -66,6 +59,7 @@ def main():
         args.min_delta = 1
 
     print(args, file=sys.stderr)
+    os.environ['PATH'] += os.pathsep + '/home/eeojun/Downloads/nauty26r12/'
     generate_graphs(args)
 
 

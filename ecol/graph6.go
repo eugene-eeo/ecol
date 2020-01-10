@@ -24,7 +24,7 @@ func get_size(data []byte) (cursor int, size int) {
 		cursor = 8
 	}
 	for i := m; i < cursor; i++ {
-		size += int(data[i] - 63)
+		size += int(data[i]) - 63
 	}
 	return
 }

@@ -36,6 +36,29 @@ func main() {
 
 	flag.Parse()
 
+	if *is_gc {
+		// GC mode
+		config := &GraphCheckConfig{
+			Delta:     *delta,
+			DeltaCore: *delta_core,
+			Overfull:  *overfull,
+			Underfull: *underfull,
+		}
+		var vmConfig *VMConfig = nil
+		if *is_vm {
+			vmConfig = &VMConfig{
+				Tasks:        *tasks,
+				Attempts:     *attempts,
+				UseVH:        *use_vh,
+				UseCH:        *use_ch,
+				UseBF:        false,
+				EmitClassOne: *emit_class_one,
+			}
+			vmConfig.Init()
+		}
+		gc_perform(config, vmConfig)
+		return
+	}
 	if *is_vm {
 		// VM mode
 		config := &VMConfig{
@@ -46,16 +69,7 @@ func main() {
 			UseBF:        false,
 			EmitClassOne: *emit_class_one,
 		}
+		config.Init()
 		vm_perform(config)
-	}
-	if *is_gc {
-		// GC mode
-		config := &GraphCheckConfig{
-			Delta:     *delta,
-			DeltaCore: *delta_core,
-			Overfull:  *overfull,
-			Underfull: *underfull,
-		}
-		gc_perform(config)
 	}
 }

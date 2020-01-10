@@ -8,6 +8,10 @@ import "os"
 import "bufio"
 import "github.com/willf/bitset"
 
+type EdgeDataOutput struct {
+	EdgeData [][]int `json:"edge_data"`
+}
+
 type GraphCheckConfig struct {
 	DeltaCore int
 	Delta     int
@@ -74,21 +78,58 @@ func valid_semicore(gc *GraphCheckMetadata) bool {
 	return true
 }
 
-func gc_perform(config *GraphCheckConfig) {
+func gc_vm_task(config *VMConfig, gc *GraphCheckMetadata) (int, *Graph) {
+	// Construct template graph
+	graph := gc.G
+	delta := gc.Delta
+	class := 2
+
+	// Used in the loop
+	g := NewGraph(graph.n)
+
+OUTER:
+	for _, algorithm := range config.Algorithms {
+		for i := 0; i < config.Attempts; i++ {
+			graph.CopyInto(g)
+			cg := WrapGraph(g)
+			algorithm(cg)
+			if colours_used(cg) == delta {
+				class = 1
+				break OUTER
+			}
+		}
+	}
+
+	return class, g
+}
+
+func gc_perform(config *GraphCheckConfig, vmConfig *VMConfig) {
 	writer := bufio.NewWriter(os.Stdout)
 	defer writer.Flush()
 
 	encoder := json.NewEncoder(writer)
 	scanner := bufio.NewScanner(os.Stdin)
+
 	for scanner.Scan() {
 		data := scanner.Bytes()
 		gc := NewGraphCheckMetadata(ParseGraph6Bytes(data))
+
+		// Validate graph
 		if valid_semicore(gc) &&
 			gc.Delta == config.Delta &&
 			core_delta(gc, config.DeltaCore) &&
 			(!config.Overfull || is_overfull(gc.G)) &&
 			(!config.Underfull || !is_overfull(gc.G)) {
-			encoder.Encode(map[string][][]int{"edge_data": gc.G.edge_data})
+
+			// Emit if we should
+			if vmConfig == nil {
+				encoder.Encode(EdgeDataOutput{gc.G.edge_data})
+			} else {
+				class, graph := gc_vm_task(vmConfig, gc)
+				if class == 2 || vmConfig.EmitClassOne {
+					encoder.Encode(EdgeDataOutput{graph.edge_data})
+				}
+			}
 		}
 	}
 }

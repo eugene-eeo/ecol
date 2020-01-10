@@ -38,9 +38,10 @@ type VMConfig struct {
 	UseCH        bool
 	UseBF        bool
 	EmitClassOne bool
+	Algorithms   []func(*ColouringGraph)
 }
 
-func (vc *VMConfig) Algorithms() []func(*ColouringGraph) {
+func (vc *VMConfig) Init() {
 	algos := []func(*ColouringGraph){}
 	if vc.UseVH {
 		algos = append(algos, vizing_heuristic)
@@ -51,7 +52,7 @@ func (vc *VMConfig) Algorithms() []func(*ColouringGraph) {
 	if vc.UseBF {
 		algos = append(algos, brute_force_colour)
 	}
-	return algos
+	vc.Algorithms = algos
 }
 
 type VMOutput map[string]interface{}
@@ -65,7 +66,7 @@ func vm_task(config *VMConfig, input VMInput) VMOutput {
 	class := 2
 
 OUTER:
-	for _, algorithm := range config.Algorithms() {
+	for _, algorithm := range config.Algorithms {
 		for i := 0; i < config.Attempts; i++ {
 			g := NewGraph(graph.n)
 			graph.CopyInto(g)

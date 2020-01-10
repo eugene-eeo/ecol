@@ -13,13 +13,13 @@ from pyecol.utils import is_overfull, graph_to_golang_graph, max_degree
 
 
 def run_command(n, delta, min_delta, underfull):
-    template = 'geng -cq -d{min_delta} {n} | showg -a'
+    template = 'geng -c -d{min_delta} {n} | showg -a'
     mine = None
     maxe = None
     if delta is not None:
         if underfull is not None:
             # We cannot calculate a overfull/underfull mine/maxe without delta!
-            template = 'geng -cq -d{min_delta} -D{delta} {n} {mine}:{maxe} | showg -a'
+            template = 'geng -c -d{min_delta} -D{delta} {n} {mine}:{maxe} | showg -a'
             if underfull:
                 mine = 0
                 maxe = delta * int(n // 2)
@@ -27,7 +27,8 @@ def run_command(n, delta, min_delta, underfull):
                 mine = delta * int(n // 2) + 1
                 maxe = 0
         else:
-            template = 'geng -cq -d{min_delta} -D{delta} {n} | showg -a'
+            template = 'geng -c -d{min_delta} -D{delta} {n} {mine}:0 | showg -a'
+            mine = max(delta, n - 1)
 
     cmd = template.format(
         mine=mine,
@@ -42,7 +43,7 @@ def run_command(n, delta, min_delta, underfull):
         shell=True,
         env={"PATH": "/home/eeojun/Downloads/nauty26r12/"},
         stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        stderr=sys.stderr,
     )
     while True:
         line = proc.stdout.readline()
@@ -58,7 +59,19 @@ def deg_core(g):
     return max_degree(h)
 
 
-def adj_mat_to_graph(lines, n, underfull=None, delta_core=None):
+def graph_is_semicore(g):
+    deg = g.degrees()
+    delta = max(deg.values())
+    core = [n for n, d in deg.items() if d == delta]
+    ed = g.edge_data
+    for i, d in deg.items():
+        row = ed[i]
+        if d != delta and not any(row[u] is not False for u in core):
+            return False
+    return True
+
+
+def adj_mat_to_graph(lines, n, delta=None, underfull=None, delta_core=None, is_semicore=False):
     while True:
         line = next(lines, "")
         if not line:
@@ -70,20 +83,22 @@ def adj_mat_to_graph(lines, n, underfull=None, delta_core=None):
                 mat.append(line.strip())
             g = Graph(n)
             g.edge_data = [[False if x == '0' else 0 for x in row] for row in mat]
-            if (underfull is None or is_overfull(g) == (not underfull)) and \
-                    (delta_core is None or deg_core(g) == delta_core):
+            if (delta is None or max_degree(g) == delta) and \
+                    (underfull is None or is_overfull(g) == (not underfull)) and \
+                    (delta_core is None or deg_core(g) == delta_core) and \
+                    (not is_semicore or graph_is_semicore(g)):
                 yield g
 
 
 def generate_graphs(args):
-    if args.min_delta is None:
-        args.min_delta = args.delta - 1 if (args.delta is not None) else 1
     for n in range(args.start, args.end + 1, args.step):
         yield from adj_mat_to_graph(
             run_command(n=n, delta=args.delta, min_delta=args.min_delta, underfull=args.underfull),
             n=n,
+            delta=args.delta,
             underfull=args.underfull,
             delta_core=args.delta_core,
+            is_semicore=args.is_semicore,
         )
 
 
@@ -92,6 +107,7 @@ def main():
     parser.add_argument('--delta', dest='delta', type=int, required=False, default=None)
     parser.add_argument('--min-delta', dest='min_delta', type=int, required=False, default=None)
     parser.add_argument('--delta-core', dest='delta_core', type=int, required=False, default=None)
+    parser.add_argument('--is-semicore', dest='is_semicore', action='store_true', required=False, default=False)
 
     parser.add_argument('--underfull', dest='underfull', action='store_true', required=False, default=None)
     parser.add_argument('--overfull', dest='underfull', action='store_false', required=False, default=None)
@@ -101,6 +117,10 @@ def main():
     parser.add_argument('--step', dest='step', type=int, default=1)
 
     args = parser.parse_args()
+    if args.min_delta is None:
+        args.min_delta = 1
+
+    print(args, file=sys.stderr)
     for g in generate_graphs(args):
         data = {
             "n": g.n,

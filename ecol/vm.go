@@ -117,11 +117,11 @@ func vm_perform(config *VMConfig) {
 	// Spawn writer
 	go func() {
 		w := bufio.NewWriter(os.Stdout)
+		defer w.Flush()
 		encoder := json.NewEncoder(w)
 		for output := range resultsChan {
 			encoder.Encode(output)
 		}
-		w.Flush()
 		writerWg.Done()
 	}()
 

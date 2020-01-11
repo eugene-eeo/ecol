@@ -27,32 +27,35 @@ type GraphCheckMetadata struct {
 	Delta   int
 }
 
-func NewGraphCheckMetadata(G *Graph) *GraphCheckMetadata {
-	core := bitset.New(uint(G.n))
-	adjList := make([]*bitset.BitSet, G.n)
-	degree := make([]int, G.n)
-	delta := max_degree(G)
+func (gc *GraphCheckMetadata) Alloc() {
+	gc.Core = bitset.New(uint(gc.G.n))
+	gc.Degree = make([]int, gc.G.n)
+	gc.AdjList = make([]*bitset.BitSet, gc.G.n)
+	for i, _ := range gc.AdjList {
+		gc.AdjList[i] = bitset.New(uint(gc.G.n))
+	}
+}
 
-	for u := 0; u < G.n; u++ {
-		degree[u] = G.Degree(u)
-		if degree[u] == delta {
-			core.Set(uint(u))
+func (gc *GraphCheckMetadata) Update() {
+	// Clear everything first
+	gc.Core.ClearAll()
+	for i, bs := range gc.AdjList {
+		bs.ClearAll()
+		gc.Degree[i] = 0
+	}
+	// Actually update
+	gc.Delta = max_degree(gc.G)
+	for u := 0; u < gc.G.n; u++ {
+		gc.Degree[u] = gc.G.Degree(u)
+		if gc.Degree[u] == gc.Delta {
+			gc.Core.Set(uint(u))
 		}
-		adj := G.edge_data[u]
-		adjList[u] = bitset.New(uint(G.n))
-		for v := 0; v < G.n; v++ {
+		adj := gc.G.edge_data[u]
+		for v := 0; v < gc.G.n; v++ {
 			if adj[v] != -1 {
-				adjList[u].Set(uint(v))
+				gc.AdjList[u].Set(uint(v))
 			}
 		}
-	}
-
-	return &GraphCheckMetadata{
-		G:       G,
-		Core:    core,
-		AdjList: adjList,
-		Degree:  degree,
-		Delta:   delta,
 	}
 }
 
@@ -110,15 +113,19 @@ func gc_perform(config *GraphCheckConfig, vmConfig *VMConfig) {
 
 	// Avoid allocations if possible
 	g := NewGraph(0)
+	gc := &GraphCheckMetadata{G: g}
 
 	for scanner.Scan() {
 		data := scanner.Bytes()
 		cursor, size := graph6_get_size(data)
 		if size != g.n {
 			g = NewGraph(size)
+			gc.G = g
+			gc.Alloc()
 		}
 		graph6_write_graph(data[cursor:], size, g)
-		gc := NewGraphCheckMetadata(g)
+		gc.G = g
+		gc.Update()
 
 		// Validate graph
 		if valid_semicore(gc) &&

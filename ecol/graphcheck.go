@@ -105,14 +105,20 @@ OUTER:
 
 func gc_perform(config *GraphCheckConfig, vmConfig *VMConfig) {
 	writer := bufio.NewWriter(os.Stdout)
-	defer writer.Flush()
-
 	encoder := json.NewEncoder(writer)
 	scanner := bufio.NewScanner(os.Stdin)
 
+	// Avoid allocations if possible
+	g := NewGraph(0)
+
 	for scanner.Scan() {
 		data := scanner.Bytes()
-		gc := NewGraphCheckMetadata(ParseGraph6Bytes(data))
+		cursor, size := graph6_get_size(data)
+		if size != g.n {
+			g = NewGraph(size)
+		}
+		graph6_write_graph(data[cursor:], size, g)
+		gc := NewGraphCheckMetadata(g)
 
 		// Validate graph
 		if valid_semicore(gc) &&
@@ -124,10 +130,12 @@ func gc_perform(config *GraphCheckConfig, vmConfig *VMConfig) {
 			// Emit if we should
 			if vmConfig == nil {
 				encoder.Encode(EdgeDataOutput{gc.G.edge_data})
+				writer.Flush()
 			} else {
 				class, graph := gc_vm_task(vmConfig, gc)
 				if class == 2 || vmConfig.EmitClassOne {
 					encoder.Encode(EdgeDataOutput{graph.edge_data})
+					writer.Flush()
 				}
 			}
 		}

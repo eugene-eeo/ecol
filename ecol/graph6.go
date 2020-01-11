@@ -2,7 +2,7 @@
 
 package main
 
-func get_size(data []byte) (cursor int, size int) {
+func graph6_get_size(data []byte) (cursor int, size int) {
 	m := 0 // number of leading 126s
 	for i := 0; i < len(data); i++ {
 		if data[i] == 126 {
@@ -29,8 +29,7 @@ func get_size(data []byte) (cursor int, size int) {
 	return
 }
 
-func get_graph(data []byte, size int) *Graph {
-	graph := NewGraph(size)
+func graph6_write_graph(data []byte, size int, graph *Graph) {
 	k := 0
 	// Generate ordering (0,1),(0,2),(1,2),(0,3),(1,3),(2,3),...
 	// Might look weird but consider:
@@ -44,14 +43,15 @@ func get_graph(data []byte, size int) *Graph {
 			m := byte(1 << uint(7-k%6)) // mask
 			if (b & m) != 0 {
 				graph.Set(u, v, 0)
+			} else {
+				graph.Set(u, v, -1)
 			}
 			k++
 		}
 	}
-	return graph
 }
 
-func ParseGraph6Bytes(data []byte) *Graph {
-	cursor, size := get_size(data)
-	return get_graph(data[cursor:], size)
-}
+// func ParseGraph6Bytes(data []byte) *Graph {
+// 	cursor, size := get_size(data)
+// 	return get_graph(data[cursor:], size)
+// }

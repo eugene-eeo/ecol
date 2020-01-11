@@ -9,8 +9,8 @@ import "os/signal"
 // Expect edge_data in this input
 type VMInput map[string]interface{}
 
-func (vc VMInput) EdgeData() [][]int {
-	ed, ok := vc["edge_data"]
+func (vi VMInput) EdgeData() [][]int {
+	ed, ok := vi["edge_data"]
 	if !ok {
 		return nil
 	}

@@ -124,7 +124,6 @@ func gc_perform(config *GraphCheckConfig, vmConfig *VMConfig) {
 			gc.Alloc()
 		}
 		graph6_write_graph(data[cursor:], size, g)
-		gc.G = g
 		gc.Update()
 
 		// Validate graph

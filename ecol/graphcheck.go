@@ -81,15 +81,11 @@ func valid_semicore(gc *GraphCheckMetadata) bool {
 	return true
 }
 
-func gc_vm_task(config *VMConfig, gc *GraphCheckMetadata) (int, *Graph) {
+func gc_vm_task(config *VMConfig, gc *GraphCheckMetadata, g *Graph) (int, *Graph) {
 	// Construct template graph
 	graph := gc.G
 	delta := gc.Delta
 	class := 2
-
-	// Used in the loop
-	g := NewGraph(graph.n)
-
 OUTER:
 	for _, algorithm := range config.Algorithms {
 		for i := 0; i < config.Attempts; i++ {
@@ -102,7 +98,6 @@ OUTER:
 			}
 		}
 	}
-
 	return class, g
 }
 
@@ -113,6 +108,7 @@ func gc_perform(config *GraphCheckConfig, vmConfig *VMConfig) {
 
 	// Avoid allocations if possible
 	g := NewGraph(0)
+	h := NewGraph(0)
 	gc := &GraphCheckMetadata{G: g}
 
 	for scanner.Scan() {
@@ -120,6 +116,7 @@ func gc_perform(config *GraphCheckConfig, vmConfig *VMConfig) {
 		cursor, size := graph6_get_size(data)
 		if size != g.n {
 			g = NewGraph(size)
+			h = NewGraph(size)
 			gc.G = g
 			gc.Alloc()
 		}
@@ -138,7 +135,7 @@ func gc_perform(config *GraphCheckConfig, vmConfig *VMConfig) {
 				encoder.Encode(EdgeDataOutput{gc.G.edge_data})
 				writer.Flush()
 			} else {
-				class, graph := gc_vm_task(vmConfig, gc)
+				class, graph := gc_vm_task(vmConfig, gc, h)
 				if class == 2 || vmConfig.EmitClassOne {
 					encoder.Encode(EdgeDataOutput{graph.edge_data})
 					writer.Flush()

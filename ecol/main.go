@@ -29,6 +29,7 @@ func main() {
 	emit_class_one := flag.Bool("emit-class-one", false, "emit class one graphs")
 
 	// GC FLAGS
+	validate := flag.Bool("validate", true, "perform semicore, delta-core, and delta checks")
 	delta_core := flag.Int("delta-core", 2, "delta core")
 	delta := flag.Int("delta", 5, "delta")
 	overfull := flag.Bool("overfull", false, "overfull")
@@ -43,6 +44,7 @@ func main() {
 			DeltaCore: *delta_core,
 			Overfull:  *overfull,
 			Underfull: *underfull,
+			Validate:  *validate,
 		}
 		var vmConfig *VMConfig = nil
 		if *is_vm {

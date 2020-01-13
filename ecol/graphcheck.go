@@ -17,6 +17,7 @@ type GraphCheckConfig struct {
 	Delta     int
 	Overfull  bool
 	Underfull bool
+	Validate  bool
 }
 
 type GraphCheckMetadata struct {
@@ -124,9 +125,10 @@ func gc_perform(config *GraphCheckConfig, vmConfig *VMConfig) {
 		gc.Update()
 
 		// Validate graph
-		if valid_semicore(gc) &&
-			gc.Delta == config.Delta &&
-			core_delta(gc, config.DeltaCore) &&
+		if (!config.Validate ||
+			(valid_semicore(gc) &&
+				gc.Delta == config.Delta &&
+				core_delta(gc, config.DeltaCore))) &&
 			(!config.Overfull || is_overfull(gc.G)) &&
 			(!config.Underfull || !is_overfull(gc.G)) {
 

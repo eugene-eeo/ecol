@@ -18,6 +18,11 @@ bitset bitset_set(bitset bs, int pos, int val) {
     return bs | ((uint64_t)1 << pos);
 }
 
+// Test bit
+int bitset_test(bitset bs, int pos) {
+    return bs & ((uint64_t)1 << pos);
+}
+
 // Intersection of a and b
 bitset bitset_intersection(bitset a, bitset b) {
     return a & b;

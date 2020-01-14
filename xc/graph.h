@@ -17,6 +17,7 @@ typedef struct {
 
 // Graph functions
 graph graph_create(int n);
+void graph_free(graph* g);
 void graph_set(graph* g, int u, int v, int colour);
 int graph_get(graph* g, int u, int v);
 int graph_get_degree(graph* g, int u);
@@ -28,5 +29,6 @@ int* allocate_path_array(graph* g);
 int get_path(graph* g, int v, int alpha, int beta, int* path);
 void switch_path(graph* g, int* path, int length, int alpha, int beta);
 int verify_colouring(graph* g);
+int colours_used(graph* g);
 
 #endif /* GRAPH_H */

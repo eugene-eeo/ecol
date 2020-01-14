@@ -71,3 +71,13 @@ func (g *Graph) CopyInto(h *Graph) {
 		}
 	}
 }
+
+func (g *Graph) ResetColours() {
+	for i := 0; i < g.n; i++ {
+		for j := 0; j < g.n; j++ {
+			if g.edge_data[i][j] != -1 {
+				g.edge_data[i][j] = 0
+			}
+		}
+	}
+}

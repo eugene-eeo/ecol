@@ -94,7 +94,7 @@ func valid_semicore(gc *GraphCheckMetadata) bool {
 	return true
 }
 
-func gc_vm_task(config *VMConfig, gc *GraphCheckMetadata, g *Graph) (int, *Graph) {
+func gc_vm_task(config *VMConfig, gc *GraphCheckMetadata) int {
 	// Construct template graph
 	graph := gc.G
 	delta := gc.Delta
@@ -102,8 +102,8 @@ func gc_vm_task(config *VMConfig, gc *GraphCheckMetadata, g *Graph) (int, *Graph
 OUTER:
 	for _, algorithm := range config.Algorithms {
 		for i := 0; i < config.Attempts; i++ {
-			graph.CopyInto(g)
-			cg := WrapGraph(g)
+			graph.ResetColours()
+			cg := WrapGraph(graph)
 			algorithm(cg)
 			if colours_used(cg) == delta {
 				class = 1
@@ -111,7 +111,7 @@ OUTER:
 			}
 		}
 	}
-	return class, g
+	return class
 }
 
 func gc_perform(config *GraphCheckConfig, vmConfig *VMConfig) {
@@ -131,14 +131,12 @@ func gc_perform(config *GraphCheckConfig, vmConfig *VMConfig) {
 		go func() {
 			// Avoid allocations if possible
 			g := NewGraph(0)
-			h := NewGraph(0)
 			gc := &GraphCheckMetadata{G: g}
 			for str := range dataChan {
 				data := []byte(str)
 				cursor, size := graph6_get_size(data)
 				if size != g.n {
 					g = NewGraph(size)
-					h = NewGraph(size)
 					gc.G = g
 					gc.Alloc()
 				}
@@ -153,9 +151,9 @@ func gc_perform(config *GraphCheckConfig, vmConfig *VMConfig) {
 					b, _ := json.Marshal(EdgeDataOutput{gc.G.edge_data})
 					outChan <- b
 				} else {
-					class, graph := gc_vm_task(vmConfig, gc, h)
+					class := gc_vm_task(vmConfig, gc)
 					if class == 2 || vmConfig.EmitClassOne {
-						b, _ := json.Marshal(EdgeDataOutput{graph.edge_data})
+						b, _ := json.Marshal(EdgeDataOutput{gc.G.edge_data})
 						outChan <- b
 					}
 				}

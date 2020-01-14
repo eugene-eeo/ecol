@@ -1,27 +1,27 @@
+#include <unistd.h>
+#include <stdlib.h>
 #include <stdio.h>
+
 #include "bitset.h"
 #include "graph.h"
+#include "graph6.h"
 #include "vizing_heuristic.h"
 
 int main() {
-    bitset bs = BITSET_INIT;
-    /* bs = bitset_set(bs, 0, 1); */
-    /* bs = bitset_set(bs, 1, 1); */
-    bs = bitset_set(bs, 63, 1);
-    printf("%ld\n", bs);
-    printf("%d\n", bitset_count(bs));
-    printf("%d\n", bitset_first(bs));
-    printf("%ld\n", bitset_intersection(bs, BITSET_INIT));
-
-    // =====================
-
-    graph h = graph_create(10);
-    for (int i = 0; i < h.size; i++) {
-        for (int j = i + 1; j < h.size; j++) {
-            graph_set(&h, i, j, 0);
+    graph g = graph_create(0);
+    char *line = NULL;
+    size_t size;
+    while (getline(&line, &size, stdin) != -1) {
+        graph6_state gs = graph6_get_size(line);
+        if (gs.size != g.size) {
+            graph_free(&g);
+            g = graph_create(gs.size);
+        }
+        graph6_write_graph(line, gs.cursor, gs.size, &g);
+        int delta = graph_max_degree(&g);
+        vizing_heuristic(&g);
+        if (colours_used(&g) == delta + 1) {
+            write(1, line, size);
         }
     }
-    printf("%d\n", h.num_uncoloured);
-    vizing_heuristic(&h);
-    printf("%d\n", verify_colouring(&h));
 }

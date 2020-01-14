@@ -22,6 +22,12 @@ graph graph_create(int n) {
     return g;
 }
 
+// Destroy graph
+void graph_free(graph* g) {
+    free(g->edges);
+    free(g->free);
+}
+
 // Set edge colour
 void graph_set(graph* g, int u, int v, int colour) {
     int og = g->edges[(u * g->size) + v];
@@ -152,4 +158,15 @@ int verify_colouring(graph *g) {
         }
     }
     return 1;
+}
+
+// Colours used in the graph
+int colours_used(graph *g) {
+    bitset bs = BITSET_INIT;
+    for (int i = 0; i < g->size; i++) {
+        for (int j = i+1; j < g->size; j++) {
+            bs = bitset_set(bs, graph_get(g, i, j), 1);
+        }
+    }
+    return bitset_count(bs);
 }

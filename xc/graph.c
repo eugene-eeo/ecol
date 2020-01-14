@@ -31,8 +31,8 @@ void graph_set(graph* g, int u, int v, int colour) {
 
     if (og != 0) {
         if (og != -1) {
-            g->free[u] = bitset_set(g->free[u], og, 0);
-            g->free[v] = bitset_set(g->free[v], og, 0);
+            g->free[u] = bitset_set(g->free[u], og, 1);
+            g->free[v] = bitset_set(g->free[v], og, 1);
         }
         if (colour == 0) {
             g->num_uncoloured++;
@@ -40,8 +40,8 @@ void graph_set(graph* g, int u, int v, int colour) {
     }
 
     if (colour != 0) {
-        g->free[u] = bitset_set(g->free[u], colour, 1);
-        g->free[v] = bitset_set(g->free[v], colour, 1);
+        g->free[u] = bitset_set(g->free[u], colour, 0);
+        g->free[v] = bitset_set(g->free[v], colour, 0);
         if (og == 0) {
             g->num_uncoloured--;
         }
@@ -137,4 +137,19 @@ void switch_path(graph* g, int* path, int length, int alpha, int beta) {
 }
 
 int verify_colouring(graph *g) {
+    for (int i = 0; i < g->size; i++) {
+        int n = 0;
+        int m = i * g->size;
+        bitset b = BITSET_INIT;
+        for (int j = 0; j < g->size; j++) {
+            if (g->edges[m + j] != -1) {
+                b = bitset_set(b, g->edges[m+j], 1);
+                n++;
+            }
+        }
+        if (bitset_count(b) != n) {
+            return 0;
+        }
+    }
+    return 1;
 }

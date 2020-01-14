@@ -27,5 +27,6 @@ int graph_max_degree(graph* g);
 int* allocate_path_array(graph* g);
 int get_path(graph* g, int v, int alpha, int beta, int* path);
 void switch_path(graph* g, int* path, int length, int alpha, int beta);
+int verify_colouring(graph* g);
 
 #endif /* GRAPH_H */

@@ -12,7 +12,6 @@
 #include "bitset.h"
 #include "graph.h"
 #include "vizing_heuristic.h"
-#include <stdio.h>
 
 void vizing_heuristic(graph* g) {
     int delta = graph_max_degree(g);
@@ -46,6 +45,7 @@ void vizing_heuristic(graph* g) {
         if (S) {
             int colour = bitset_first(S);
             graph_set(g, w, v_0, colour);
+            taboo = 0;
         } else {
             // Check if free[v_0] has some colour != taboo
             S = bitset_set(g->free[v_0], taboo, 0);

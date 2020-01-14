@@ -11,14 +11,7 @@ int main() {
     printf("%ld\n", bs);
     printf("%d\n", bitset_count(bs));
     printf("%d\n", bitset_first(bs));
-
-    graph g = graph_create(10);
-    graph_set(&g, 0, 1, 1);
-    graph_set(&g, 2, 3, 0);
-    edge e = graph_next_uncoloured_edge(&g);
-
-    printf("%d,%d\n", e.i, e.j);
-    printf("%d\n", graph_max_degree(&g));
+    printf("%ld\n", bitset_intersection(bs, BITSET_INIT));
 
     // =====================
 
@@ -30,4 +23,5 @@ int main() {
     }
     printf("%d\n", h.num_uncoloured);
     vizing_heuristic(&h);
+    printf("%d\n", verify_colouring(&h));
 }

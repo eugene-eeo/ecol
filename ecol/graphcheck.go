@@ -5,6 +5,7 @@ package main
 
 import "encoding/json"
 import "os"
+import "sync"
 import "bufio"
 import "github.com/willf/bitset"
 
@@ -60,6 +61,17 @@ func (gc *GraphCheckMetadata) Update() {
 	}
 }
 
+func (gc *GraphCheckMetadata) Validate(config *GraphCheckConfig) bool {
+	if !config.Validate {
+		return true
+	}
+	return (config.Delta == 0 || config.Delta == gc.Delta) &&
+		valid_semicore(gc) &&
+		core_delta(gc, config.DeltaCore) &&
+		(!config.Overfull || is_overfull(gc.G)) &&
+		(!config.Underfull || !is_overfull(gc.G))
+}
+
 // core_delta checks if the max degree of core = delta
 func core_delta(gc *GraphCheckMetadata, target int) bool {
 	deg := uint(target)
@@ -103,46 +115,68 @@ OUTER:
 }
 
 func gc_perform(config *GraphCheckConfig, vmConfig *VMConfig) {
-	writer := bufio.NewWriter(os.Stdout)
-	encoder := json.NewEncoder(writer)
 	scanner := bufio.NewScanner(os.Stdin)
 
-	// Avoid allocations if possible
-	g := NewGraph(0)
-	h := NewGraph(0)
-	gc := &GraphCheckMetadata{G: g}
+	TASKS := 8
+	workerWg := &sync.WaitGroup{}
+	workerWg.Add(TASKS)
+	writerWg := &sync.WaitGroup{}
+	writerWg.Add(1)
 
-	for scanner.Scan() {
-		data := scanner.Bytes()
-		cursor, size := graph6_get_size(data)
-		if size != g.n {
-			g = NewGraph(size)
-			h = NewGraph(size)
-			gc.G = g
-			gc.Alloc()
-		}
-		graph6_write_graph(data[cursor:], size, g)
-		gc.Update()
+	dataChan := make(chan string, 8)
+	outChan := make(chan []byte, 8)
 
-		// Validate graph
-		if (!config.Validate ||
-			(valid_semicore(gc) &&
-				gc.Delta == config.Delta &&
-				core_delta(gc, config.DeltaCore))) &&
-			(!config.Overfull || is_overfull(gc.G)) &&
-			(!config.Underfull || !is_overfull(gc.G)) {
-
-			// Emit if we should
-			if vmConfig == nil {
-				encoder.Encode(EdgeDataOutput{gc.G.edge_data})
-				writer.Flush()
-			} else {
-				class, graph := gc_vm_task(vmConfig, gc, h)
-				if class == 2 || vmConfig.EmitClassOne {
-					encoder.Encode(EdgeDataOutput{graph.edge_data})
-					writer.Flush()
+	// Worker tasks
+	for i := 0; i < TASKS; i++ {
+		go func() {
+			// Avoid allocations if possible
+			g := NewGraph(0)
+			h := NewGraph(0)
+			gc := &GraphCheckMetadata{G: g}
+			for str := range dataChan {
+				data := []byte(str)
+				cursor, size := graph6_get_size(data)
+				if size != g.n {
+					g = NewGraph(size)
+					h = NewGraph(size)
+					gc.G = g
+					gc.Alloc()
+				}
+				graph6_write_graph(data[cursor:], size, g)
+				gc.Update()
+				// Validate graph
+				if !gc.Validate(config) {
+					continue
+				}
+				// Emit if we should
+				if vmConfig == nil {
+					b, _ := json.Marshal(EdgeDataOutput{gc.G.edge_data})
+					outChan <- b
+				} else {
+					class, graph := gc_vm_task(vmConfig, gc, h)
+					if class == 2 || vmConfig.EmitClassOne {
+						b, _ := json.Marshal(EdgeDataOutput{graph.edge_data})
+						outChan <- b
+					}
 				}
 			}
-		}
+			workerWg.Done()
+		}()
 	}
+
+	go func() {
+		for jsonData := range outChan {
+			os.Stdout.Write(jsonData)
+			os.Stdout.Write([]byte("\n"))
+		}
+		writerWg.Done()
+	}()
+
+	for scanner.Scan() {
+		dataChan <- scanner.Text()
+	}
+	close(dataChan)
+	workerWg.Wait()
+	close(outChan)
+	writerWg.Wait()
 }

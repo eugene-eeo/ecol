@@ -9,11 +9,12 @@
 // We won't be using the algorithm on graphs with degrees or
 // node counts more than 64, so it's fine to use the int64
 // bitset.
+#include <stdlib.h>
 #include "bitset.h"
 #include "graph.h"
 #include "vizing_heuristic.h"
 
-void vizing_heuristic(graph* g) {
+int vizing_heuristic(graph* g, int* P) {
     int delta = graph_max_degree(g);
     bitset colours = BITSET_INIT;
     for (int i = 0; i <= delta; i++) {
@@ -30,7 +31,6 @@ void vizing_heuristic(graph* g) {
     int w = -1;
     int v_0 = -1;
     int beta = 0;
-    int* P = allocate_path_array(g);
     bitset S = BITSET_INIT;
 
     while (g->num_uncoloured > 0) {
@@ -50,11 +50,12 @@ void vizing_heuristic(graph* g) {
             // Check if free[v_0] has some colour != taboo
             S = bitset_set(g->free[v_0], taboo, 0);
             if (!S) {
-                for (int i = 0; i < g->size; i++) {
-                    g->free[i] = bitset_set(g->free[i], delta+1, 1);
-                }
-                graph_set(g, w, v_0, delta+1);
-                taboo = 0;
+                /* for (int i = 0; i < g->size; i++) { */
+                /*     g->free[i] = bitset_set(g->free[i], delta+1, 1); */
+                /* } */
+                /* graph_set(g, w, v_0, delta+1); */
+                /* taboo = 0; */
+                return 2;
             } else {
                 int alpha = bitset_first(S);
                 if (taboo == 0) {
@@ -74,4 +75,5 @@ void vizing_heuristic(graph* g) {
             }
         }
     }
+    return 1;
 }

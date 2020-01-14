@@ -9,18 +9,22 @@
 
 int main() {
     graph g = graph_create(0);
-    char *line = NULL;
+    int* P = allocate_path_array(&g);
+    char* line = NULL;
     size_t size;
+
     while (getline(&line, &size, stdin) != -1) {
         graph6_state gs = graph6_get_size(line);
         if (gs.size != g.size) {
             graph_free(&g);
+            free(P);
             g = graph_create(gs.size);
+            P = allocate_path_array(&g);
         }
+
+        g.num_uncoloured = 0;
         graph6_write_graph(line, gs.cursor, gs.size, &g);
-        int delta = graph_max_degree(&g);
-        vizing_heuristic(&g);
-        if (colours_used(&g) == delta + 1) {
+        if (vizing_heuristic(&g, P) == 2) {
             write(1, line, size);
         }
     }

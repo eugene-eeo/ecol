@@ -98,6 +98,14 @@ int graph_max_degree(graph* g) {
     return delta;
 }
 
+// Clear a graph
+void graph_clear(graph *g) {
+    int N = g->size * g->size;
+    for (int i = 0; i < N; i++) {
+        g->edges[i] = -1;
+    }
+}
+
 
 // Utilities
 int* allocate_path_array(graph* g) {

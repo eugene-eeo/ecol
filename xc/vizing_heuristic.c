@@ -9,7 +9,6 @@
 // We won't be using the algorithm on graphs with degrees or
 // node counts more than 64, so it's fine to use the int64
 // bitset.
-#include <stdlib.h>
 #include "bitset.h"
 #include "graph.h"
 #include "vizing_heuristic.h"
@@ -65,6 +64,7 @@ int vizing_heuristic(graph* g, int* P) {
                 if (P[len-1] != w) {
                     switch_path(g, P, len, beta, alpha);
                     graph_set(g, w, v_0, beta);
+                    taboo = 0;
                 } else {
                     int a = P[len-2];
                     graph_set(g, w, a, 0);

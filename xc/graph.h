@@ -23,6 +23,7 @@ int graph_get(graph* g, int u, int v);
 int graph_get_degree(graph* g, int u);
 edge graph_next_uncoloured_edge(graph* g);
 int graph_max_degree(graph* g);
+void graph_clear(graph* g);
 
 // Utilities
 int* allocate_path_array(graph* g);

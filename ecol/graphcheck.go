@@ -62,14 +62,16 @@ func (gc *GraphCheckMetadata) Update() {
 }
 
 func (gc *GraphCheckMetadata) Validate(config *GraphCheckConfig) bool {
+	if (config.Overfull && !is_overfull(gc.G)) ||
+		(config.Underfull && is_overfull(gc.G)) {
+		return false
+	}
 	if !config.Validate {
 		return true
 	}
 	return (config.Delta == 0 || config.Delta == gc.Delta) &&
 		valid_semicore(gc) &&
-		core_delta(gc, config.DeltaCore) &&
-		(!config.Overfull || is_overfull(gc.G)) &&
-		(!config.Underfull || !is_overfull(gc.G))
+		core_delta(gc, config.DeltaCore)
 }
 
 // core_delta checks if the max degree of core = delta
@@ -99,6 +101,9 @@ func gc_vm_task(config *VMConfig, gc *GraphCheckMetadata) int {
 	graph := gc.G
 	delta := gc.Delta
 	class := 2
+	if is_overfull(graph) {
+		return 2
+	}
 OUTER:
 	for _, algorithm := range config.Algorithms {
 		for i := 0; i < config.Attempts; i++ {

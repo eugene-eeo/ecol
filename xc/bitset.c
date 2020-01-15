@@ -12,10 +12,12 @@ const bitset BITSET_INIT = 0;
 
 // Set bit pos to val
 bitset bitset_set(bitset bs, int pos, int val) {
-    if (!val) {
-        return bs & (INT64_MAX ^ ((uint64_t)1 << pos));
+    int64_t mask = (((uint64_t)1) << pos);
+    if (val) {
+        return bs | mask;
+    } else {
+        return bs & ~mask;
     }
-    return bs | ((uint64_t)1 << pos);
 }
 
 // Test bit

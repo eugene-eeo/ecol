@@ -62,8 +62,11 @@ int graph_get(graph* g, int u, int v) {
 // Compute degree of node
 int graph_get_degree(graph* g, int u) {
     int delta = 0;
-    for (int i = 0; i < g->size; i++) {
-        if (g->edges[u * g->size + i] != -1) {
+    int n = g->size;
+    int b = u * n;
+    int* edges = g->edges;
+    for (int i = 0; i < n; i++) {
+        if (edges[b + i] != -1) {
             delta++;
         }
     }
@@ -74,10 +77,11 @@ int graph_get_degree(graph* g, int u) {
 edge graph_next_uncoloured_edge(graph* g) {
     edge e = {-1, -1};
     int n = g->size;
+    int* edges = g->edges;
     for (int i = 0; i < n; i++) {
         int m = i * n;
         for (int j = i + 1; j < n; j++) {
-            if (g->edges[m + j] == 0) {
+            if (edges[m + j] == 0) {
                 e.i = i;
                 e.j = j;
                 return e;

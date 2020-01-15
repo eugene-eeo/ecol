@@ -1,15 +1,15 @@
-all: clean deps
-	gcc -O3 -o xc main.o graph.o bitset.o vizing_heuristic.o graph6.o
+CC=gcc
+CFLAGS= -std=c99 -O3
 
-debug: deps
-	gcc -O3 -g -o xc main.o graph.o bitset.o vizing_heuristic.o graph6.o
+all: xc clean
 
-deps:
-	gcc -c -g graph.c
-	gcc -c -g bitset.c
-	gcc -c -g vizing_heuristic.c
-	gcc -c -g graph6.c
-	gcc -c -g main.c
+xc: deps
+	${CC} $(CFLAGS) -o xc main.o graph.o bitset.o vizing_heuristic.o graph6.o
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+deps: graph.o bitset.o vizing_heuristic.o graph6.o main.o
 
 clean:
-	rm *.o
+	-rm *.o

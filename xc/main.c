@@ -12,8 +12,9 @@ int main() {
     int* P = allocate_path_array(&g);
     char* line = NULL;
     size_t size;
+    ssize_t nbytes;
 
-    while (getline(&line, &size, stdin) != -1) {
+    while ((nbytes = getline(&line, &size, stdin)) > 0) {
         graph6_state gs = graph6_get_size(line);
         if (gs.size != g.size) {
             graph_free(&g);
@@ -25,7 +26,7 @@ int main() {
         g.num_uncoloured = 0;
         graph6_write_graph(line, gs.cursor, gs.size, &g);
         if (vizing_heuristic(&g, P) == 2) {
-            write(1, line, size);
+            write(1, line, nbytes);
         }
     }
 }

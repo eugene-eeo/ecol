@@ -22,7 +22,7 @@ wait"""
 
 
 for i in range(mod // cores):
-    task_template = "nauty/geng -c {n} {res}/{mod} | xc/xc > /data/hvcs85/xc-{n}-{res}.out &"
+    task_template = "nauty/geng -c {n} {res}/{mod} | xc/xc > /ddn/data/hvcs85/xc-{n}-{res}.out &"
 
     tasks = "\n".join(task_template.format(n=n, res=((i * cores) + res), mod=mod) for res in range(cores))
 

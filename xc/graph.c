@@ -156,8 +156,10 @@ int verify_colouring(graph *g) {
         int m = i * g->size;
         bitset b = BITSET_INIT;
         for (int j = 0; j < g->size; j++) {
-            if (g->edges[m + j] != -1) {
-                b = bitset_set(b, g->edges[m+j], 1);
+            int colour = g->edges[m + j];
+            if (colour == 0) return 0;
+            if (colour != -1) {
+                b = bitset_set(b, colour, 1);
                 n++;
             }
         }

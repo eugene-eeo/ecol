@@ -3,6 +3,7 @@ n = 12
 mod = 96
 run = 0
 cores = 24
+refilter = True
 
 script = """#!/bin/bash
 #SBATCH --job-name="xs-{n}"
@@ -22,7 +23,10 @@ wait"""
 
 
 for i in range(mod // cores):
-    task_template = "nauty/geng -c {n} {res}/{mod} | xc/xc > /ddn/data/hvcs85/xc-{n}-{res}.out &"
+    if not refilter:
+        task_template = "nauty/geng -c {n} {res}/{mod} | xc/xc > /ddn/data/hvcs85/xc-{n}-{res}.out &"
+    else:
+        task_template = "cat /ddn/data/hvcs85/xc-{n}-{res}.out | xc/xc > /ddn/data/hvcs85/xc-{n}-{res}-filtered.out &"
 
     tasks = "\n".join(task_template.format(n=n, res=((i * cores) + res), mod=mod) for res in range(cores))
 

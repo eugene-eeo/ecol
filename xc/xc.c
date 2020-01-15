@@ -1,3 +1,14 @@
+/*
+ * xc.c
+ * ====
+ *
+ * xc is a fast filter that takes in graph6 format graphs
+ * and then emits them if they are class 2. usage example:
+ *
+ *     geng -c 5 | xc | ...
+ *
+ */
+
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>

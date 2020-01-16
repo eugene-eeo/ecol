@@ -19,7 +19,7 @@
 #include "graph6.h"
 #include "vizing_heuristic.h"
 
-const int ATTEMPTS = 10;
+const int ATTEMPTS = 15;
 
 // xorshift prng
 typedef struct xorshift64s_state {
@@ -102,11 +102,12 @@ int main() {
         graph6_write_graph(line, gs.cursor, gs.size, &g);
 
         int class1 = 0;
+        int delta = graph_max_degree(&g);
         // Only do colouring if graph is underfull
-        if (g.num_uncoloured <= graph_max_degree(&g) * (g.size / 2)) {
+        if (g.num_uncoloured <= delta * (g.size / 2)) {
             int num_uncoloured = g.num_uncoloured;
             for (int a = 0; a < ATTEMPTS; a++) {
-                class1 = vizing_heuristic(&g, P) == 1;
+                class1 = vizing_heuristic(&g, P, delta) == 1;
                 if (class1)
                     break;
                 remap(&state, map, ed, &g, num_uncoloured);

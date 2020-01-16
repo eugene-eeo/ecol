@@ -77,19 +77,25 @@ func (gc *GraphCheckMetadata) Validate(config *GraphCheckConfig) bool {
 // core_delta checks if the max degree of core = delta
 func core_delta(gc *GraphCheckMetadata, target int) bool {
 	deg := uint(target)
+	max := uint(0)
 	for i := 0; i < gc.G.n; i++ {
-		if gc.Degree[i] == gc.Delta &&
-			gc.Core.IntersectionCardinality(gc.AdjList[i]) > deg {
-			return false
+		if gc.Degree[i] == gc.Delta {
+			c_deg := gc.Core.IntersectionCardinality(gc.AdjList[i])
+			if c_deg > deg {
+				return false
+			}
+			if c_deg > max {
+				max = c_deg
+			}
 		}
 	}
-	return true
+	return max == deg
 }
 
 // valid_semicore checks if the graph is a valid semicore
 func valid_semicore(gc *GraphCheckMetadata) bool {
 	for i := 0; i < gc.G.n; i++ {
-		if gc.Degree[i] < gc.Delta && gc.Core.IntersectionCardinality(gc.AdjList[i]) == 0 {
+		if gc.Core.IntersectionCardinality(gc.AdjList[i]) == 0 {
 			return false
 		}
 	}

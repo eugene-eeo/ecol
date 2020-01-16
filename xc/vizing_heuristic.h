@@ -3,6 +3,6 @@
 
 #include "graph.h"
 
-int vizing_heuristic(graph* g, int* P);
+int vizing_heuristic(graph* g, int* P, int delta);
 
 #endif /* VIZING_H */

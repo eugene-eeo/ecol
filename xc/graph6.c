@@ -33,7 +33,12 @@ void graph6_write_graph(char* data, int cursor, int size, graph* g) {
         for (int u = 0; u < v; u++) {
             int b = (data[cursor + (k / 6)] - 63) << 2;
             int m = (1 << (7 - k%6));
-            graph_set(g, u, v, (b & m) ? 0 : -1);
+            /* graph_set(g, u, v, (b & m) ? 0 : -1); */
+            int c = (b & m) ? 0 : -1;
+            g->edges[u * size + v] = c;
+            g->edges[v * size + u] = c;
+            if (c == 0)
+                g->num_uncoloured++;
             k++;
         }
     }

@@ -13,13 +13,7 @@
 #include "graph.h"
 #include "vizing_heuristic.h"
 
-int vizing_heuristic(graph* g, int* P) {
-    int delta = graph_max_degree(g);
-    bitset colours = BITSET_INIT;
-    for (int i = 0; i <= delta; i++) {
-        colours = bitset_set(colours, i, 1);
-    }
-
+int vizing_heuristic(graph* g, int* P, int delta) {
     // Set available colours to delta
     bitset bs = (int64_t) (1 << (delta+1)) - 2;
     for (int i = 0; i < g->size; i++) {

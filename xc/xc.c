@@ -98,7 +98,6 @@ int main() {
         }
 
         graph_clear(&g);
-        g.num_uncoloured = 0;
         graph6_write_graph(line, gs.cursor, gs.size, &g);
 
         int class1 = 0;

@@ -104,6 +104,7 @@ int graph_max_degree(graph* g) {
 
 // Clear a graph
 void graph_clear(graph *g) {
+    g->num_uncoloured = 0;
     int N = g->size * g->size;
     for (int i = 0; i < N; i++) {
         g->edges[i] = -1;

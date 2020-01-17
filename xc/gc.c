@@ -1,7 +1,11 @@
 /*
- * graphcheck.c
- * ============
+ * gc.c
+ * ====
  * Fast filter similar to ecol graphcheck.
+ * Usage:
+ *
+ *    geng -c 8 | gc -u | ...
+ *
  */
 
 #include "bitset.h"
@@ -118,11 +122,6 @@ int main(int argc, char* argv[]) {
     int overfull = 0;
     int underfull = 0;
 
-    if (argc == 1) {
-        printf("%s", help);
-        exit(0);
-    }
-
     while ((opt = getopt(argc, argv, "hd:sD:ou")) != -1) {
         switch (opt) {
             case 'h':
@@ -147,6 +146,12 @@ int main(int argc, char* argv[]) {
         }
     }
 
+    if (core_delta == 0 && semicore == 0 && delta == 0 && overfull == 0 && underfull == 0) {
+        printf("%s", help);
+        exit(1);
+    }
+
+    // Whether we need allocations for delta, adj, core
     int need_advanced = delta || core_delta || semicore;
 
     // Main loop

@@ -19,7 +19,7 @@ def cvt_graph(edge_data):
 
 
 def filter_isomorphic(graphs):
-    MAX = 5000
+    MAX = 10000
     prevs = deque(maxlen=MAX)
     for line, graph in graphs:
         if any(isomorphic(graph, g) for g in prevs):

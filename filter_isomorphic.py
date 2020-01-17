@@ -16,7 +16,7 @@ def get_edge_list(edge_data):
 
 def golang_graph_to_graphtool_graph(edge_data):
     G = Graph(directed=False)
-    G.add_vertex(len(edge_data))
+    G.add_vertex(n=len(edge_data))
     G.add_edge_list(get_edge_list(edge_data))
     return G
 

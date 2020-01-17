@@ -14,12 +14,9 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#include "bitset.h"
 #include "graph.h"
 #include "graph6.h"
 #include "vizing_heuristic.h"
-
-const int ATTEMPTS = 15;
 
 // xorshift prng
 typedef struct xorshift64s_state {
@@ -68,7 +65,12 @@ void init_map(int* map, int size) {
         map[i] = i;
 }
 
-int main() {
+int main(int argc, char* argv[]) {
+    int ATTEMPTS = 15;
+
+    if (argc == 2)
+        ATTEMPTS = atoi(argv[1]);
+
     // vizing
     graph g = graph_create(0);
     int* P = allocate_path_array(&g);

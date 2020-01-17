@@ -22,10 +22,12 @@ typedef struct {
 } graphcheck;
 
 // Deallocate
-void graphcheck_free(graphcheck* gc) {
+void graphcheck_free(graphcheck* gc, int need_advanced) {
     graph_free(gc->g);
-    free(gc->adj);
-    free(gc->degree);
+    if (need_advanced) {
+        free(gc->adj);
+        free(gc->degree);
+    }
 
     gc->g = NULL;
     gc->adj = NULL;
@@ -35,30 +37,35 @@ void graphcheck_free(graphcheck* gc) {
 }
 
 // Allocate core, adj, ... in response to graph
-void graphcheck_alloc(graphcheck* gc) {
-    gc->core = BITSET_INIT;
-    gc->adj = calloc(gc->g->size, sizeof(bitset));
-    gc->degree = calloc(gc->g->size, sizeof(int));
-    gc->delta = graph_max_degree(gc->g);
+void graphcheck_alloc(graphcheck* gc, int need_advanced) {
+    if (need_advanced) {
+        gc->core = BITSET_INIT;
+        gc->adj = calloc(gc->g->size, sizeof(bitset));
+        gc->degree = calloc(gc->g->size, sizeof(int));
+    }
+    gc->delta = 0;
 }
 
 // Update for new graph of same size
-void graphcheck_update(graphcheck* gc) {
-    gc->core = BITSET_INIT;
-    for (int i = 0 ; i < gc->g->size; i++) {
-        gc->degree[i] = 0;
-        gc->adj[i] = BITSET_INIT;
-    }
-    // Actually update here
+void graphcheck_update(graphcheck* gc, int need_advanced) {
     gc->delta = graph_max_degree(gc->g);
-    for (int u = 0; u < gc->g->size; u++) {
-        gc->degree[u] = graph_get_degree(gc->g, u);
-        if (gc->degree[u] == gc->delta) {
-            gc->core = bitset_set(gc->core, u, 1);
+    if (need_advanced) {
+        // Clear old data
+        gc->core = BITSET_INIT;
+        for (int i = 0 ; i < gc->g->size; i++) {
+            gc->degree[i] = 0;
+            gc->adj[i] = BITSET_INIT;
         }
-        for (int v = 0; v < gc->g->size; v++) {
-            if (graph_get(gc->g, u, v) != -1) {
-                gc->adj[u] = bitset_set(gc->adj[u], v, 1);
+        // Actually update here
+        for (int u = 0; u < gc->g->size; u++) {
+            gc->degree[u] = graph_get_degree(gc->g, u);
+            if (gc->degree[u] == gc->delta) {
+                gc->core = bitset_set(gc->core, u, 1);
+            }
+            for (int v = 0; v < gc->g->size; v++) {
+                if (graph_get(gc->g, u, v) != -1) {
+                    gc->adj[u] = bitset_set(gc->adj[u], v, 1);
+                }
             }
         }
     }
@@ -140,12 +147,14 @@ int main(int argc, char* argv[]) {
         }
     }
 
+    int need_advanced = delta || core_delta || semicore;
+
     // Main loop
     // graph
     graph g = graph_create(0);
     graphcheck gc;
     gc.g = &g;
-    graphcheck_alloc(&gc);
+    graphcheck_alloc(&gc, need_advanced);
 
     // IO
     char* line = NULL;
@@ -155,14 +164,14 @@ int main(int argc, char* argv[]) {
     while ((nbytes = getline(&line, &size, stdin)) > 0) {
         graph6_state gs = graph6_get_size(line);
         if (gs.size != g.size) {
-            graphcheck_free(&gc);
+            graphcheck_free(&gc, need_advanced);
             g = graph_create(gs.size);
             gc.g = &g;
-            graphcheck_alloc(&gc);
+            graphcheck_alloc(&gc, need_advanced);
         }
         graph_clear(&g);
         graph6_write_graph(line, gs.cursor, gs.size, &g);
-        graphcheck_update(&gc);
+        graphcheck_update(&gc, need_advanced);
 
         const int valid =
             (overfull  ? gc.overfull  : 1) &&

@@ -2,10 +2,9 @@
  * xc_exact.c
  * ==========
  *
- * xc is a fast filter that takes in graph6 format graphs
- * and then emits them if they are class 2. usage example:
+ * xce is slow as fucc lol
  *
- *     geng -c 5 | xc | ...
+ *     geng -c 5 | xce | ...
  *
  */
 

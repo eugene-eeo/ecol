@@ -1,31 +1,28 @@
+# needs pyenv shell 2.7.17 since pynauty is installed there!
+
 import sys
 import json
 from collections import deque
-
-from graph_tool import Graph
-from graph_tool.topology import isomorphism
+from pynauty import Graph, isomorphic
 
 
-def get_edge_list(edge_data):
+def get_adj_dict(edge_data):
+    d = {}
     n = len(edge_data)
     for i, row in enumerate(edge_data):
-        for j in range(i + 1, n):
-            if row[j] == 0:
-                yield (i, j)
+        d[i] = [j for j in range(i + 1, n) if row[j] == 0]
+    return d
 
 
-def golang_graph_to_graphtool_graph(edge_data):
-    G = Graph(directed=False)
-    G.add_vertex(n=len(edge_data))
-    G.add_edge_list(get_edge_list(edge_data))
-    return G
+def cvt_graph(edge_data):
+    return Graph(len(edge_data), directed=False, adjacency_dict=get_adj_dict(edge_data))
 
 
 def filter_isomorphic(graphs):
-    MAX = 1000
+    MAX = 5000
     prevs = deque(maxlen=MAX)
     for line, graph in graphs:
-        if any(isomorphism(graph, g) for g in prevs):
+        if any(isomorphic(graph, g) for g in prevs):
             continue
         prevs.append(graph)
         yield line
@@ -34,7 +31,7 @@ def filter_isomorphic(graphs):
 def graphs_from_stdin():
     for i, line in enumerate(sys.stdin):
         data = json.loads(line.strip())
-        yield line, golang_graph_to_graphtool_graph(data["edge_data"])
+        yield line, cvt_graph(data["edge_data"])
         if i % 100 == 0:
             sys.stderr.write("%d\n" % i)
             sys.stderr.flush()

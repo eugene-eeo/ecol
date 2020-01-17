@@ -169,7 +169,7 @@ int main(int argc, char* argv[]) {
             (underfull ? !gc.overfull : 1) &&
             (semicore  ? check_valid_semicore(&gc) : 1) &&
             (core_delta == 0 || check_core_delta(&gc, core_delta)) &&
-            (delta == 0 || gc.delta == delta)
+            (delta == 0      || gc.delta == delta)
         ;
         if (valid)
             write(1, line, nbytes);

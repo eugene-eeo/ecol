@@ -6,6 +6,7 @@
  *
  *    geng -c 8 | gc -u | ...
  *
+ * Only use if the graphs have size <= 64.
  */
 
 #include "bitset.h"

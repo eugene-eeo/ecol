@@ -15,7 +15,7 @@
 
 int vizing_heuristic(graph* g, int* P, int delta) {
     // Set available colours to delta
-    bitset bs = (int64_t) (1 << (delta+1)) - 2;
+    bitset bs = ((int64_t) 1 << (delta+1)) - 2;
     for (int i = 0; i < g->size; i++) {
         g->free[i] = bs;
     }

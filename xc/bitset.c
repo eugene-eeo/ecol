@@ -22,7 +22,7 @@ bitset bitset_set(bitset bs, int pos, int val) {
 
 // Test bit
 int bitset_test(bitset bs, int pos) {
-    return bs & ((uint64_t)1 << pos);
+    return (bs & ((uint64_t)1 << pos)) != 0;
 }
 
 // Intersection of a and b

@@ -3,7 +3,7 @@ n = 12
 mod = 96
 run = 0
 cores = 24
-refilter = True
+refilter = False
 random = False
 prog = "xc/xc 100"
 
@@ -12,7 +12,7 @@ script = """#!/bin/bash
 #SBATCH -o xs-{n}.%A.out
 #SBATCH -e xs-{n}.%A.err
 #SBATCH -p par7.q
-#SBATCH -t 00:30:00
+#SBATCH -t 01:00:00
 #SBATCH --exclusive
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=24
@@ -25,7 +25,7 @@ wait"""
 
 for i in range(mod // cores):
     if random:
-        task_template = "nauty/genrang -g -P2 {n} 1000000 | {prog} > /ddn/data/hvcs85/xc-{n}-{res}.out"
+        task_template = "nauty/genrang -g -P2 {n} 10000000 | {prog} > /ddn/data/hvcs85/xc-{n}-{res}.out"
     else:
         if refilter:
             task_template = "cat /ddn/data/hvcs85/xc-{n}-{res}.out | {prog} > /ddn/data/hvcs85/xc-{n}-{res}-filtered.out &"
@@ -34,5 +34,8 @@ for i in range(mod // cores):
 
     tasks = "\n".join(task_template.format(n=n, res=((i * cores) + res), mod=mod, prog=prog) for res in range(cores))
 
-    open('job-{n}-{i}'.format(n=n, i=i), 'w').write(script.format(tasks=tasks, n=n))
-    print('sbatch job-{n}-{i}'.format(n=n, i=i))
+    job_name = 'job-{n}-{i}-{p}'.format(n=n, i=i, p=(
+        "random" if random else "refilter" if refilter else "geng"
+    ))
+    open(job_name, 'w').write(script.format(tasks=tasks, n=n))
+    print('sbatch {name}'.format(name=job_name))

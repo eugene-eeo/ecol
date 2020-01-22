@@ -1,7 +1,7 @@
 # needs pyenv shell 2.7.17 since pynauty is installed there!
 
 import sys
-import json
+import ujson as json
 from collections import deque
 from pynauty import Graph, isomorphic
 
@@ -19,13 +19,12 @@ def cvt_graph(edge_data):
 
 
 def filter_isomorphic(graphs):
-    MAX = 10000
+    MAX = 20000
     prevs = deque(maxlen=MAX)
     for line, graph in graphs:
-        if any(isomorphic(graph, g) for g in prevs):
-            continue
-        prevs.append(graph)
-        yield line
+        if not any(isomorphic(graph, g) for g in prevs):
+            prevs.append(graph)
+            yield line
 
 
 def graphs_from_stdin():

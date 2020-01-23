@@ -2,10 +2,11 @@
 
 #include "graph.h"
 #include "graph6.h"
+#include <stdio.h>
 
 // Get size of the graph and a cursor
 graph6_state graph6_get_size(char* data) {
-    graph6_state s = { 0, 0 };
+    graph6_state s;
     s.cursor = 1;
     s.size = data[0] - 63;
     return s;
@@ -28,10 +29,42 @@ void graph6_write_graph(char* data, int cursor, int size, graph* g) {
     }
 }
 
+// Bytes needed to write graph g
 int graph6_get_bytes_needed(graph g) {
     // N(x)
     int n = 1;
     // R(X)
     int r = 0;
-    return n;
+    int edges = (g.size * (g.size - 1)) / 2;
+    // length = ceil(k / 6)
+    r = edges / 6 + (edges % 6 > 0);
+    return n + r;
+}
+
+void graph6_write_bytes(graph g, char* buf, int bytes_needed) {
+    int n = g.size;
+
+    // Write size
+    buf[0] = n;
+
+    // Write R(x)
+    int k = 0;
+    int m = 0;
+    for (int v = 0; v < n; v++) {
+        for (int u = 0; u < v; u++) {
+            int i = k / 6;
+            int j = 5 - (k % 6);
+            if (g.edges[m + u] == -1) {
+                buf[i + 1] &= ~((char)1 << j);
+            } else {
+                buf[i + 1] |= ((char)1 << j);
+            }
+            k++;
+        }
+        m += n;
+    }
+
+    for (int i = 0; i < bytes_needed; i++) {
+        buf[i] += 63;
+    }
 }

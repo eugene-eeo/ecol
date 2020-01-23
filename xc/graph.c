@@ -185,12 +185,3 @@ int colours_used(graph *g) {
     }
     return bitset_count(bs);
 }
-
-int graph_count_edges(graph *g) {
-    int n = g->size;
-    for (int i = 0; i < n; i++) {
-        int m = i * n;
-        for (int j = i + 1; j < n; j++) {
-        }
-    }
-}

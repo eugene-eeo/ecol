@@ -21,10 +21,16 @@ int randrange(int m, int n) {
     return m + rand() / (RAND_MAX / (n - m + 1) + 1);
 }
 
+typedef struct {
+    int created;
+    graph g;
+} maybe_graph;
+
 // extend core
-graph extend_core(graph core, int maxn, int delta) {
-    while (1) {
-        int n = randrange(core.size, maxn);
+maybe_graph extend_core(graph core, int maxn, int delta, int attempts) {
+    maybe_graph m;
+    for (int i = 0; i < attempts; i++) {
+        int n = randrange(core.size + 1, maxn);
         graph g = graph_create(n);
         // Allowed # neighbours per node
         int* allowed = calloc(n, sizeof(int));
@@ -100,7 +106,9 @@ graph extend_core(graph core, int maxn, int delta) {
 
         free(allowed);
         if (ok) {
-            return g;
+            m.g = g;
+            m.created = 1;
+            return m;
         }
         // Otherwise we need to free g
         graph_free(&g);
@@ -108,10 +116,11 @@ graph extend_core(graph core, int maxn, int delta) {
 }
 
 char* help =
-    "usage: cg [-h] [-S#] [-n#] -N# -d#\n"
+    "usage: cg [-h] [-S#] [-a#] [-n#] -N# -d#\n"
     "\n"
     "options:\n"
     "    -S# seed rng (default = time.time)\n"
+    "    -a# attempts (default = 10000)\n"
     "    -d# degree of semicores\n"
     "    -N# max number of nodes per semicore\n"
     "    -n# number of random semicores per core (default = 100)\n"
@@ -128,8 +137,9 @@ int main(int argc, char* argv[]) {
     int nodes_per_semicore = 0;
     int semicores_per_core = 100;
     int seed = time(NULL) ^ getpid();
+    int attempts = 10000;
 
-    while ((opt = getopt(argc, argv, "hd:N:n:")) != -1) {
+    while ((opt = getopt(argc, argv, "hS:a:n:N:d:")) != -1) {
         switch (opt) {
             case 'h':
                 showhelp(0);
@@ -145,6 +155,9 @@ int main(int argc, char* argv[]) {
                 break;
             case 'S':
                 seed = atoi(optarg);
+                break;
+            case 'a':
+                attempts = atoi(optarg);
                 break;
         }
     }
@@ -164,17 +177,21 @@ int main(int argc, char* argv[]) {
         graph core = graph_create(gs.size);
         graph6_write_graph(line, gs.cursor, gs.size, &core);
 
-        for (int i = 0; i < semicores_per_core; i++) {
-            graph g = extend_core(core, nodes_per_semicore, delta);
-            int n = graph6_get_bytes_needed(g);
+        if (core.size + 1 < nodes_per_semicore) {
+            for (int i = 0; i < semicores_per_core; i++) {
+                maybe_graph m = extend_core(core, nodes_per_semicore, delta, attempts);
+                if (!m.created)
+                    continue;
+                int n = graph6_get_bytes_needed(m.g);
 
-            char* buf = calloc(n + 1, sizeof(char));
-            graph6_write_bytes(g, buf, n);
-            buf[n] = '\n';
+                char* buf = calloc(n + 1, sizeof(char));
+                graph6_write_bytes(m.g, buf, n);
+                buf[n] = '\n';
 
-            write(1, buf, n+1);
-            graph_free(&g);
-            free(buf);
+                write(1, buf, n+1);
+                graph_free(&m.g);
+                free(buf);
+            }
         }
         graph_free(&core);
     }

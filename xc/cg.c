@@ -29,6 +29,8 @@ typedef struct {
 // extend core
 maybe_graph extend_core(graph core, int maxn, int delta, int attempts) {
     maybe_graph m;
+    m.created = 0;
+
     for (int i = 0; i < attempts; i++) {
         int n = randrange(core.size + 1, maxn);
         graph g = graph_create(n);
@@ -56,29 +58,16 @@ maybe_graph extend_core(graph core, int maxn, int delta, int attempts) {
         for (int u = core.size; u < g.size; u++) {
             if (allowed[u] == 0) continue;
             int core_count = randrange(1, allowed[u]); // # core nodes
-            int other = allowed[u] - core_count;       // # other nodes
 
-            // Links to core
-            for (int i = 0; i < core_count; i++) {
+            for (int i = 0; i < allowed[u]; i++) {
+                int need_core = i < core_count;
+                int min = need_core ? 0             : core.size;
+                int max = need_core ? core.size - 1 : n - 1;
                 int set = 0;
-                for (int a = 0; a < core.size; a++) {
-                    int v = randrange(0, core.size - 1);
-                    if (allowed[v] == 0 || graph_get(&g, u, v) == 0) continue;
-                    // Otherwise add this link
-                    graph_set(&g, u, v, 0);
-                    allowed[u]--;
-                    allowed[v]--;
-                    set = 1;
-                    break;
-                }
-                if (!set) break;
-            }
-
-            // Links to other nodes
-            for (int i = 0; i < other; i++) {
-                int set = 0;
-                for (int a = 0; a < n - core.size; a++) {
-                    int v = randrange(core.size, g.size - 1);
+                // Try this n times, if we cannot find something
+                // then just go next.
+                for (int a = 0; a < n; a++) {
+                    int v = randrange(min, max);
                     if (allowed[v] == 0 || graph_get(&g, u, v) == 0) continue;
                     // Otherwise add this link
                     graph_set(&g, u, v, 0);
@@ -92,11 +81,11 @@ maybe_graph extend_core(graph core, int maxn, int delta, int attempts) {
         }
 
         // Check that it's valid!
-        for (int i = 0; i < g.size; i++) {
+        for (int u = 0; u < g.size; u++) {
             // For core nodes, degree needs to be delta
             // otherwise degree needs to be > 0
-            int deg = graph_get_degree(&g, i);
-            if (i < core.size
+            int deg = graph_get_degree(&g, u);
+            if (u < core.size
                     ? (deg != delta)
                     : (deg == 0 || deg == delta)) {
                 ok = 0;

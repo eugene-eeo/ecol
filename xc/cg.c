@@ -63,20 +63,15 @@ maybe_graph extend_core(graph core, int maxn, int delta, int attempts) {
                 int need_core = i < core_count;
                 int min = need_core ? 0             : core.size;
                 int max = need_core ? core.size - 1 : n - 1;
-                int set = 0;
-                // Try this n times, if we cannot find something
-                // then just go next.
-                for (int a = 0; a < n; a++) {
+                for (int a = 0; a < n * n; a++) {
                     int v = randrange(min, max);
-                    if (allowed[v] == 0 || graph_get(&g, u, v) == 0) continue;
+                    if (u == v || allowed[v] == 0 || graph_get(&g, u, v) == 0) continue;
                     // Otherwise add this link
                     graph_set(&g, u, v, 0);
                     allowed[u]--;
                     allowed[v]--;
-                    set = 1;
                     break;
                 }
-                if (!set) break;
             }
         }
 

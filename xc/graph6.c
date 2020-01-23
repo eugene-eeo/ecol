@@ -1,29 +1,13 @@
+// Only handles graphs of size <= 62
+
 #include "graph.h"
 #include "graph6.h"
 
 // Get size of the graph and a cursor
 graph6_state graph6_get_size(char* data) {
-    int m = 0;
-    for (int i = 0; i < 2; i++) {
-        if (data[i] == 126) {
-            m++;
-        } else {
-            break;
-        }
-    }
     graph6_state s = { 0, 0 };
-    // 3 cases for m:
-    // (0) N(n) = n+63         [1 bytes]
-    // (1) N(n) = 126 R(x)     [4 bytes]
-    // (2) N(n) = 126 126 R(x) [8 bytes]
-    switch (m) {
-        case 0: s.cursor = 1; break;
-        case 1: s.cursor = 4; break;
-        case 2: s.cursor = 8; break;
-    }
-    for (int i = m; i < s.cursor; i++) {
-        s.size += data[i] - 63;
-    }
+    s.cursor = 1;
+    s.size = data[0] - 63;
     return s;
 }
 
@@ -42,4 +26,12 @@ void graph6_write_graph(char* data, int cursor, int size, graph* g) {
             k++;
         }
     }
+}
+
+int graph6_get_bytes_needed(graph g) {
+    // N(x)
+    int n = 1;
+    // R(X)
+    int r = 0;
+    return n;
 }

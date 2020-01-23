@@ -24,7 +24,7 @@ func graph6_get_size(data []byte) (cursor int, size int) {
 		cursor = 8
 	}
 	for i := m; i < cursor; i++ {
-		size += int(data[i]) - 63
+		size += (1 << (6 * uint(cursor-i-1))) * (int(data[i]) - 63)
 	}
 	return
 }

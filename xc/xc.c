@@ -10,6 +10,7 @@
  * Only use if the graphs have size <= 62.
  */
 
+#define  _GNU_SOURCE
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>

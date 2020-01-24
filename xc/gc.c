@@ -9,6 +9,7 @@
  * Only use if the graphs have size <= 62.
  */
 
+#define  _GNU_SOURCE
 #include "bitset.h"
 #include "graph.h"
 #include "graph6.h"
@@ -104,12 +105,35 @@ int check_valid_semicore(graphcheck *gc) {
     return 1;
 }
 
+int dfs(int u, bitset* visited, graph g, int parent) {
+    *visited = bitset_set(*visited, u, 1);
+    for (int v = 0; v < g.size; v++) {
+        if (u != v && graph_get(&g, u, v) != -1) {
+            if (v == parent) continue;
+            if (bitset_test(*visited, v)) return 1;
+            if (dfs(v, visited, g, u)) return 1;
+        }
+    }
+    return 0;
+}
+
+int has_cycle(graph g) {
+    bitset visited = BITSET_INIT;
+    for (int u = 0; u < g.size; u++) {
+        if (bitset_test(visited, u)) continue;
+        if (dfs(u, &visited, g, -1)) return 1;
+        return 0;
+    }
+    return 0;
+}
+
 char* help =
-    "usage: gc [-d#] [-s] [-D#] [-o|-u] [-h]\n"
+    "usage: gc [-d#] [-s] [-c] [-D#] [-o|-u] [-h]\n"
     "\n"
     "options:\n"
     "    -d# degree of core (0 = no check)\n"
     "    -s  check if valid semicore\n"
+    "    -c  check if graph contains cycle\n"
     "    -D# graph delta (0 = no check)\n"
     "    -o  only overfull\n"
     "    -u  only underfull\n"
@@ -122,8 +146,9 @@ int main(int argc, char* argv[]) {
     int delta = 0;
     int overfull = 0;
     int underfull = 0;
+    int contains_cycle = 0;
 
-    while ((opt = getopt(argc, argv, "hd:sD:ou")) != -1) {
+    while ((opt = getopt(argc, argv, "hd:scD:ou")) != -1) {
         switch (opt) {
             case 'h':
                 printf("%s", help);
@@ -134,6 +159,9 @@ int main(int argc, char* argv[]) {
                 break;
             case 's':
                 semicore = 1;
+                break;
+            case 'c':
+                contains_cycle = 1;
                 break;
             case 'D':
                 delta = atoi(optarg);
@@ -147,7 +175,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    if (core_delta == 0 && semicore == 0 && delta == 0 && overfull == 0 && underfull == 0) {
+    if (contains_cycle == 0 && core_delta == 0 && semicore == 0 && delta == 0 && overfull == 0 && underfull == 0) {
         printf("%s", help);
         exit(1);
     }
@@ -180,9 +208,10 @@ int main(int argc, char* argv[]) {
         graphcheck_update(&gc, need_advanced);
 
         const int valid =
-            (overfull  ? gc.overfull  : 1) &&
-            (underfull ? !gc.overfull : 1) &&
-            (semicore  ? check_valid_semicore(&gc) : 1) &&
+            (overfull       ? gc.overfull  : 1) &&
+            (underfull      ? !gc.overfull : 1) &&
+            (contains_cycle ? has_cycle(g) : 1) &&
+            (semicore       ? check_valid_semicore(&gc) : 1) &&
             (core_delta == 0 || check_core_delta(&gc, core_delta)) &&
             (delta == 0      || gc.delta == delta)
         ;

@@ -8,6 +8,7 @@
  */
 
 #define  _GNU_SOURCE
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -152,6 +153,7 @@ int main(int argc, char* argv[]) {
     char* line = NULL;
     size_t size = 0;
     ssize_t nbytes = 0;
+    char* buf = calloc(graph6_get_bytes_needed(nodes_per_semicore) + 1, sizeof(char));
 
     // Core extension
     int* allowed = calloc(nodes_per_semicore, sizeof(int));
@@ -177,12 +179,11 @@ int main(int argc, char* argv[]) {
                 /*     putchar('\n'); */
                 /* } */
 
-                char* buf = calloc(b + 1, sizeof(char));
+                memset(buf, 0, b);
                 graph6_write_bytes(g, n, buf);
                 buf[b] = '\n';
 
                 write(1, buf, b+1);
-                free(buf);
             }
         }
         graph_free(&core);

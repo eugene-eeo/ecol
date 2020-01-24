@@ -184,7 +184,7 @@ int main(int argc, char* argv[]) {
 
     // Main loop
     // graph
-    graph g = graph_create(0);
+    graph g = graph_create(1);
     graphcheck gc;
     gc.g = &g;
     graphcheck_alloc(&gc, need_advanced);

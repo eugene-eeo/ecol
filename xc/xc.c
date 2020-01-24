@@ -74,7 +74,7 @@ int main(int argc, char* argv[]) {
         ATTEMPTS = atoi(argv[1]);
 
     // vizing
-    graph g = graph_create(0);
+    graph g = graph_create(1);
     int* P = allocate_path_array(&g);
 
     // Remap

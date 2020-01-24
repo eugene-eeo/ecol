@@ -34,10 +34,9 @@ int graph6_get_bytes_needed(graph g) {
     // N(x)
     int n = 1;
     // R(X)
-    int r = 0;
-    int edges = (g.size * (g.size - 1)) / 2;
     // length = ceil(k / 6)
-    r = edges / 6 + (edges % 6 > 0);
+    int edges = (g.size * (g.size - 1)) / 2;
+    int r = edges / 6 + (edges % 6 > 0);
     return n + r;
 }
 

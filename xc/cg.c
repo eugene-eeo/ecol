@@ -168,6 +168,13 @@ int main(int argc, char* argv[]) {
                     continue;
                 int n = graph6_get_bytes_needed(m.g);
 
+                // Verify that output is the same as showg
+                /* for (int u = 0; u < m.g.size; u++) { */
+                /*     for (int v = 0; v < m.g.size; v++) */
+                /*         putchar(graph_get(&m.g, u, v) == 0 ? '1' : '0'); */
+                /*     putchar('\n'); */
+                /* } */
+
                 char* buf = calloc(n + 1, sizeof(char));
                 graph6_write_bytes(m.g, buf, n);
                 buf[n] = '\n';

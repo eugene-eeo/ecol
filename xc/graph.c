@@ -37,14 +37,15 @@ void graph_free(graph* g) {
 
 // Set edge colour
 void graph_set(graph* g, int u, int v, int colour) {
-    #ifdef XC_GRAPH_COLOUR
     int og = g->edges[(u * g->size) + v];
-    #endif
 
     g->edges[(u * g->size) + v] = colour;
     g->edges[(v * g->size) + u] = colour;
 
-    #ifdef XC_GRAPH_COLOUR
+    #ifndef XC_GRAPH_COLOUR
+    if (og == -1 && colour == 0) g->num_uncoloured++;
+    if (og ==  0 && colour != 0) g->num_uncoloured--;
+    #else
     if (og != 0) {
         if (og != -1) {
             g->free[u] = bitset_set(g->free[u], og, 1);

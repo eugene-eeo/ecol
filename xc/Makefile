@@ -5,6 +5,9 @@ DEBUG_CFLAGS= -std=c99 -O0 -march=native -g
 
 all: xc_ gc_ resmod_ cg_
 
+check:
+	cppcheck *.c *.h
+
 debug:
 	$(CC) $(DEBUG_CFLAGS) $(XC_CFLAGS) -o xc xc.c graph.c bitset.c vizing_heuristic.c graph6.c
 	$(CC) $(DEBUG_CFLAGS) -o gc gc.c graph.c bitset.c graph6.c

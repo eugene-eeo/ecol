@@ -26,9 +26,9 @@ wait"""
 
 for i in range(mod // cores):
     if cg:
-        task_template = "cat cores.g6 | xc/cg -d5 -N50 -n1000 | {prog} > /ddn/data/hvcs85/xc-hzc-{res}.out"
+        task_template = "cat cores.g6 | xc/cg -d5 -N50 -n1000 | {prog} > /ddn/data/hvcs85/xc-hzc-{res}.out &"
     elif random:
-        task_template = "nauty/genrang -g -P2 {n} 10000000 | {prog} > /ddn/data/hvcs85/xc-{n}-{res}.out"
+        task_template = "nauty/genrang -g -P2 {n} 10000000 | {prog} > /ddn/data/hvcs85/xc-{n}-{res}.out &"
     elif refilter:
         task_template = "cat /ddn/data/hvcs85/xc-{n}-{res}.out | {prog} > /ddn/data/hvcs85/xc-{n}-{res}-filtered.out &"
     else:

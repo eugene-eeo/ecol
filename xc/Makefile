@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS= -std=c18 -Ofast -march=native -finline-functions -flto -funroll-loops
+CFLAGS= -std=c99 -Ofast -march=native -finline-functions -flto -funroll-loops
 XC_CFLAGS= -D 'XC_GRAPH_COLOUR=1'
 DEBUG_CFLAGS= -std=c99 -O0 -march=native -g
 

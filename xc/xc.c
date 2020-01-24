@@ -78,9 +78,9 @@ int main(int argc, char* argv[]) {
     int* P = allocate_path_array(&g);
 
     // Remap
-    int* map = calloc(0, sizeof(int));
+    int* map = calloc(1, sizeof(int));
     xorshift64s_state state = { 42 };
-    int* ed = calloc(0, sizeof(int)); // Edge data for remap
+    int* ed = calloc(1, sizeof(int)); // Edge data for remap
 
     // IO
     char* line = NULL;

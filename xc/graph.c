@@ -18,7 +18,11 @@ graph graph_create(int n) {
         edges[i] = -1;
     }
 
-    graph g = {n, edges, 0, free};
+    graph g;
+    g.size = n;
+    g.edges = edges;
+    g.num_uncoloured = 0;
+    g.free = free;
     return g;
 }
 

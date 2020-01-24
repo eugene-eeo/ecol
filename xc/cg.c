@@ -16,47 +16,41 @@
 
 #include "graph.h"
 #include "graph6.h"
+#include "bitset.h"
 
 // get a random number in the range of [m,n]
 int randrange(int m, int n) {
     return m + rand() / (RAND_MAX / (n - m + 1) + 1);
 }
 
-typedef struct {
-    int created;
-    graph g;
-} maybe_graph;
-
 // extend core
-maybe_graph extend_core(graph core, int maxn, int delta, int attempts) {
-    maybe_graph m;
-    m.created = 0;
+int extend_core(graph core, int maxn, int delta, int attempts, int* allowed, graph* g, bitset* adj) {
+    bitset core_adj = (((int64_t) 1) << core.size) - 1;
 
     for (int i = 0; i < attempts; i++) {
-        int n = randrange(core.size + 1, maxn);
-        graph g = graph_create(n);
-        // Allowed # neighbours per node
-        int* allowed = calloc(n, sizeof(int));
-
-        int ok = 1;
-        graph_clear(&g);
-        // Copy core over
-        for (int u = 0; u < core.size; u++) {
-            for (int v = u+1; v < core.size; v++) {
-                graph_set(&g, u, v, graph_get(&core, u, v));
-            }
+        for (int i = 0; i < maxn; i++) {
+            adj[i] = BITSET_INIT;
         }
+
+        int n = randrange(core.size + 1, maxn);
+        int ok = 1;
+        graph_clear(g);
+
+        // Copy core over
+        for (int u = 0; u < core.size; u++)
+            for (int v = u+1; v < core.size; v++)
+                graph_set(g, u, v, graph_get(&core, u, v));
 
         // For the existing core
         for (int u = 0; u < core.size; u++)
-            allowed[u] = delta - graph_get_degree(&g, u);
+            allowed[u] = delta - graph_get_degree(g, u);
 
         // New nodes
-        for (int u = core.size; u < g.size; u++)
+        for (int u = core.size; u < n; u++)
             allowed[u] = randrange(1, delta - 1);
 
         // Link new nodes
-        for (int u = core.size; u < g.size; u++) {
+        for (int u = core.size; u < n; u++) {
             if (allowed[u] == 0) continue;
             int core_count = randrange(1, allowed[u]); // # core nodes
 
@@ -66,38 +60,34 @@ maybe_graph extend_core(graph core, int maxn, int delta, int attempts) {
                 int max = need_core ? core.size - 1 : n - 1;
                 for (int a = 0; a < n * n; a++) {
                     int v = randrange(min, max);
-                    if (u == v || allowed[v] == 0 || graph_get(&g, u, v) == 0) continue;
+                    if (u == v || allowed[v] == 0 || bitset_test(adj[u], v)) continue;
                     // Otherwise add this link
-                    graph_set(&g, u, v, 0);
+                    graph_set(g, u, v, 0);
                     allowed[u]--;
                     allowed[v]--;
+                    adj[u] = bitset_set(adj[u], v, 1);
+                    adj[v] = bitset_set(adj[v], u, 1);
                     break;
                 }
             }
         }
 
         // Check that it's valid!
-        for (int u = 0; u < g.size; u++) {
+        for (int u = 0; u < n; u++) {
             // For core nodes, degree needs to be delta
             // otherwise degree needs to be > 0
-            int deg = graph_get_degree(&g, u);
+            int deg = graph_get_degree(g, u);
             if (u < core.size
                     ? (deg != delta)
-                    : (deg == 0 || deg == delta)) {
+                    : (deg == 0 || deg == delta || !bitset_intersection(core_adj, adj[u]))) {
                 ok = 0;
                 break;
             }
         }
 
-        free(allowed);
-        if (ok) {
-            m.g = g;
-            m.created = 1;
-            return m;
-        }
-        // Otherwise we need to free g
-        graph_free(&g);
+        if (ok) return n;
     }
+    return 0;
 }
 
 char* help =
@@ -157,6 +147,11 @@ int main(int argc, char* argv[]) {
     size_t size = 0;
     ssize_t nbytes = 0;
 
+    // Core extension
+    int* allowed = calloc(nodes_per_semicore, sizeof(int));
+    bitset* adj = calloc(nodes_per_semicore, sizeof(bitset));
+    graph g = graph_create(nodes_per_semicore);
+
     while ((nbytes = getline(&line, &size, stdin)) > 0) {
         graph6_state gs = graph6_get_size(line);
         graph core = graph_create(gs.size);
@@ -164,30 +159,30 @@ int main(int argc, char* argv[]) {
 
         if (core.size + 1 < nodes_per_semicore) {
             for (int i = 0; i < semicores_per_core; i++) {
-                maybe_graph m = extend_core(core, nodes_per_semicore, delta, attempts);
-                if (!m.created)
+                int n = extend_core(core, nodes_per_semicore, delta, attempts, allowed, &g, adj);
+                if (!n)
                     continue;
-                int n = graph6_get_bytes_needed(m.g);
+                int b = graph6_get_bytes_needed(n);
 
                 // Verify that output is the same as showg
-                /* for (int u = 0; u < m.g.size; u++) { */
-                /*     for (int v = 0; v < m.g.size; v++) */
-                /*         putchar(graph_get(&m.g, u, v) == 0 ? '1' : '0'); */
+                /* for (int u = 0; u < n; u++) { */
+                /*     for (int v = 0; v < n; v++) */
+                /*         putchar(graph_get(&g, u, v) == 0 ? '1' : '0'); */
                 /*     putchar('\n'); */
                 /* } */
 
-                char* buf = calloc(n + 1, sizeof(char));
-                graph6_write_bytes(m.g, buf, n);
-                buf[n] = '\n';
+                char* buf = calloc(b + 1, sizeof(char));
+                graph6_write_bytes(g, n, buf);
+                buf[b] = '\n';
 
-                write(1, buf, n+1);
-                graph_free(&m.g);
+                write(1, buf, b+1);
                 free(buf);
             }
         }
         graph_free(&core);
     }
 
-    if (line != NULL)
-        free(line);
+    graph_free(&g);
+    free(allowed);
+    free(adj);
 }

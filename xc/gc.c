@@ -108,8 +108,7 @@ int check_valid_semicore(graphcheck *gc) {
 int dfs(int u, bitset* visited, graph g, int parent) {
     *visited = bitset_set(*visited, u, 1);
     for (int v = 0; v < g.size; v++) {
-        if (u != v && graph_get(&g, u, v) != -1) {
-            if (v == parent) continue;
+        if (v != u && v != parent && graph_get(&g, u, v) != -1) {
             if (bitset_test(*visited, v)) return 1;
             if (dfs(v, visited, g, u)) return 1;
         }

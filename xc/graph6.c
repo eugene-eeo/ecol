@@ -29,41 +29,39 @@ void graph6_write_graph(char* data, int cursor, int size, graph* g) {
     }
 }
 
-// Bytes needed to write graph g
-int graph6_get_bytes_needed(graph g) {
+// Bytes needed to write graph of size n
+int graph6_get_bytes_needed(int n) {
     // N(x)
-    int n = 1;
+    int N = 1;
     // R(X)
     // length = ceil(k / 6)
-    int edges = (g.size * (g.size - 1)) / 2;
-    int r = edges / 6 + (edges % 6 > 0);
-    return n + r;
+    int edges = (n * (n - 1)) / 2;
+    int R = edges / 6 + (edges % 6 > 0);
+    return N + R;
 }
 
-void graph6_write_bytes(graph g, char* buf, int bytes_needed) {
-    int n = g.size;
-
+void graph6_write_bytes(graph g, int n, char* buf) {
     // Write size
     buf[0] = n;
 
     // Write R(x)
     int k = 0;
-    int m = 0;
     for (int v = 0; v < n; v++) {
         for (int u = 0; u < v; u++) {
             int i = k / 6;
             int j = 5 - (k % 6);
-            if (g.edges[m + u] == -1) {
+            if (graph_get(&g, u, v) == -1) {
                 buf[i + 1] &= ~((char)1 << j);
             } else {
                 buf[i + 1] |= ((char)1 << j);
             }
             k++;
         }
-        m += n;
     }
 
-    for (int i = 0; i < bytes_needed; i++) {
+    // remember to add 63 to all bytes
+    int b = graph6_get_bytes_needed(n);
+    for (int i = 0; i < b; i++) {
         buf[i] += 63;
     }
 }

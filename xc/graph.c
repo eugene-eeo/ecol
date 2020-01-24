@@ -11,34 +11,40 @@
 
 // Create a new graph
 graph graph_create(int n) {
-    int* edges = (int*) calloc(n * n, sizeof(int));
-    bitset* free = (bitset*) calloc(n, sizeof(bitset));
+    graph g;
+    g.edges = calloc(n * n, sizeof(int));
 
     for (int i = 0; i < n*n; i++) {
-        edges[i] = -1;
+        g.edges[i] = -1;
     }
 
-    graph g;
+#ifdef XC_GRAPH_COLOUR
+    g.free = calloc(n, sizeof(bitset));
+#endif
+
     g.size = n;
-    g.edges = edges;
     g.num_uncoloured = 0;
-    g.free = free;
     return g;
 }
 
 // Destroy graph
 void graph_free(graph* g) {
     free(g->edges);
+#ifdef XC_GRAPH_COLOUR
     free(g->free);
+#endif
 }
 
 // Set edge colour
 void graph_set(graph* g, int u, int v, int colour) {
+#ifdef XC_GRAPH_COLOUR
     int og = g->edges[(u * g->size) + v];
+#endif
 
     g->edges[(u * g->size) + v] = colour;
     g->edges[(v * g->size) + u] = colour;
 
+#ifdef XC_GRAPH_COLOUR
     if (og != 0) {
         if (og != -1) {
             g->free[u] = bitset_set(g->free[u], og, 1);
@@ -56,6 +62,7 @@ void graph_set(graph* g, int u, int v, int colour) {
             g->num_uncoloured--;
         }
     }
+#endif
 }
 
 // Get edge colour

@@ -25,8 +25,8 @@ int randrange(int m, int n) {
 
 // extend core
 int extend_core(graph core, int maxn, int delta, int attempts, int* allowed, graph* g, bitset* adj) {
+    // Bitset where bits 0..core.size-1 are all set
     bitset core_adj = (((int64_t) 1) << core.size) - 1;
-
     for (int i = 0; i < attempts; i++) {
         for (int i = 0; i < maxn; i++) {
             adj[i] = BITSET_INIT;
@@ -38,12 +38,16 @@ int extend_core(graph core, int maxn, int delta, int attempts, int* allowed, gra
 
         // Copy core over
         for (int u = 0; u < core.size; u++)
-            for (int v = u+1; v < core.size; v++)
-                graph_set(g, u, v, graph_get(&core, u, v));
+            for (int v = u+1; v < core.size; v++) {
+                int e = graph_get(&core, u, v);
+                graph_set(g, u, v, e);
+                adj[u] = bitset_set(adj[u], v, e != -1);
+                adj[v] = bitset_set(adj[v], u, e != -1);
+            }
 
         // For the existing core
         for (int u = 0; u < core.size; u++)
-            allowed[u] = delta - graph_get_degree(g, u);
+            allowed[u] = delta - bitset_count(adj[u]);
 
         // New nodes
         for (int u = core.size; u < n; u++)
@@ -75,9 +79,9 @@ int extend_core(graph core, int maxn, int delta, int attempts, int* allowed, gra
         // Check that it's valid!
         for (int u = 0; u < n; u++) {
             // For core nodes, degree needs to be delta
-            // otherwise degree needs to be > 0
-            int deg = graph_get_degree(g, u);
-            if (u < core.size
+            // otherwise, degree needs to be in [1, delta-1] and needs to touch >= 1 core node
+            int deg = bitset_count(adj[u]);
+            if ((u < core.size)
                     ? (deg != delta)
                     : (deg == 0 || deg == delta || !bitset_intersection(core_adj, adj[u]))) {
                 ok = 0;

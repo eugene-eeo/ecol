@@ -33,6 +33,7 @@ int extend_core(graph core, int maxn, int delta, int attempts, int* allowed, gra
         }
 
         int n = randrange(core.size + 1, maxn);
+        int max_tries = n * n; // # times we try to find a neighbour
         int ok = 1;
         graph_clear(g);
 
@@ -62,7 +63,7 @@ int extend_core(graph core, int maxn, int delta, int attempts, int* allowed, gra
                 int need_core = i < core_count;
                 int min = need_core ? 0             : core.size;
                 int max = need_core ? core.size - 1 : n - 1;
-                for (int a = 0; a < n * n; a++) {
+                for (int a = 0; a < max_tries; a++) {
                     int v = randrange(min, max);
                     if (u == v || allowed[v] == 0 || bitset_test(adj[u], v)) continue;
                     // Otherwise add this link
@@ -80,10 +81,11 @@ int extend_core(graph core, int maxn, int delta, int attempts, int* allowed, gra
         for (int u = 0; u < n; u++) {
             // For core nodes, degree needs to be delta
             // otherwise, degree needs to be in [1, delta-1] and needs to touch >= 1 core node
-            int deg = bitset_count(adj[u]);
+            int bs  = adj[u];
+            int deg = bitset_count(bs);
             if ((u < core.size)
                     ? (deg != delta)
-                    : (deg == 0 || deg == delta || !bitset_intersection(core_adj, adj[u]))) {
+                    : (deg == 0 || deg == delta || !bitset_intersection(core_adj, bs))) {
                 ok = 0;
                 break;
             }

@@ -126,7 +126,7 @@ int has_cycle(graph g) {
     return 0;
 }
 
-char* help =
+static const char* help =
     "usage: gc [-d#] [-s] [-c] [-D#] [-o|-u] [-h]\n"
     "\n"
     "options:\n"
@@ -137,6 +137,11 @@ char* help =
     "    -o  only overfull\n"
     "    -u  only underfull\n"
     "    -h  help message\n";
+
+int showhelp(int code) {
+    printf("%s", help);
+    exit(code);
+}
 
 int main(int argc, char* argv[]) {
     int opt;
@@ -150,8 +155,7 @@ int main(int argc, char* argv[]) {
     while ((opt = getopt(argc, argv, "hd:scD:ou")) != -1) {
         switch (opt) {
             case 'h':
-                printf("%s", help);
-                exit(0);
+                showhelp(0);
                 break;
             case 'd':
                 core_delta = atoi(optarg);
@@ -174,10 +178,8 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    if (contains_cycle == 0 && core_delta == 0 && semicore == 0 && delta == 0 && overfull == 0 && underfull == 0) {
-        printf("%s", help);
-        exit(1);
-    }
+    if (contains_cycle == 0 && core_delta == 0 && semicore == 0 && delta == 0 && overfull == 0 && underfull == 0)
+        showhelp(1);
 
     // Whether we need allocations for delta, adj, core
     int need_advanced = delta || core_delta || semicore;

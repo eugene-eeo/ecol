@@ -93,13 +93,7 @@ int extend_core(graph core, int maxn, int delta, int attempts, int* allowed, gra
 
         // Check that it's valid!
         for (int u = 0; u < n; u++) {
-            // For core nodes, degree needs to be delta
-            // otherwise, degree needs to be in [1, delta-1] and needs to touch >= 1 core node
-            int bs  = adj[u];
-            int deg = bitset_count(bs);
-            if ((u < core.size)
-                    ? (deg != delta)
-                    : (deg == 0 || deg == delta || !bitset_intersection(core_adj, bs))) {
+            if (allowed[u] != 0) {
                 ok = 0;
                 break;
             }
@@ -110,7 +104,7 @@ int extend_core(graph core, int maxn, int delta, int attempts, int* allowed, gra
     return 0;
 }
 
-char* help =
+static const char* help =
     "usage: cg [-h] [-S#] [-a#] [-n#] -N# -d#\n"
     "\n"
     "options:\n"

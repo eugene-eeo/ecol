@@ -12,5 +12,6 @@ bitset bitset_intersection(bitset a, bitset b);
 bitset bitset_union(bitset a, bitset b);
 int bitset_count(bitset a);
 int bitset_first(bitset a);
+int bitset_nthset(bitset a, int n);
 
 #endif /* BITSET_H */

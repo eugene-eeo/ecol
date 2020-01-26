@@ -3,10 +3,12 @@
  * ========
  *
  * Tiny bitset implementation for small bitsets (<= 64).
+ * Needs -mbmi2 when compiling.
  *
  */
 
 #include "bitset.h"
+#include <x86intrin.h>
 
 const bitset BITSET_INIT = 0;
 
@@ -43,4 +45,9 @@ int bitset_count(bitset a) {
 // Find first set bit
 int bitset_first(bitset a) {
     return __builtin_ffsl(a) - 1;
+}
+
+// Find the position of the nth bit set
+int bitset_nthset(bitset a, int n) {
+    return __builtin_ffsl(_pdep_u64(1ULL << n, a)) - 1;
 }

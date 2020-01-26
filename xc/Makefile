@@ -1,7 +1,7 @@
 CC=gcc
-CFLAGS= -std=c99 -Ofast -march=native -finline-functions -flto -funroll-loops
+CFLAGS= -std=c99 -Ofast -march=native -finline-functions -flto -funroll-loops -mbmi2
 XC_CFLAGS= -D 'XC_GRAPH_COLOUR=1'
-DEBUG_CFLAGS= -std=c99 -O0 -march=native -g
+DEBUG_CFLAGS= -std=c99 -O0 -march=native -g -mbmi2
 
 all: xc_ gc_ resmod_ cg_
 

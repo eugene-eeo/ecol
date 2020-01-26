@@ -98,7 +98,7 @@ int check_valid_semicore(graphcheck *gc) {
     // Check that all nodes in graph are either a
     // core node, or have a core node as neighbour
     for (int u = 0; u < gc->g->size; u++) {
-        if (!bitset_intersection(gc->core, gc->adj[u])) {
+        if (bitset_count(gc->adj[u]) != gc->delta && !bitset_intersection(gc->core, gc->adj[u])) {
             return 0;
         }
     }
@@ -207,10 +207,10 @@ int main(int argc, char* argv[]) {
         graphcheck_update(&gc, need_advanced);
 
         const int valid =
-            (overfull       ? gc.overfull  : 1) &&
-            (underfull      ? !gc.overfull : 1) &&
-            (contains_cycle ? has_cycle(g) : 1) &&
-            (semicore       ? check_valid_semicore(&gc) : 1) &&
+            (!overfull       || gc.overfull) &&
+            (!underfull      || !gc.overfull) &&
+            (!contains_cycle || has_cycle(g)) &&
+            (!semicore       || check_valid_semicore(&gc)) &&
             (core_delta == 0 || check_core_delta(&gc, core_delta)) &&
             (delta == 0      || gc.delta == delta)
         ;

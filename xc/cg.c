@@ -27,14 +27,13 @@ int randrange(int m, int n) {
 // extend core
 int extend_core(graph core, int maxn, int delta, int attempts, int* allowed, graph* g, bitset* adj) {
     // Bitset where bits 0..core.size-1 are all set
-    bitset core_adj = (((int64_t) 1) << core.size) - 1;
+    bitset core_adj = (((bitset) 1) << core.size) - 1;
     for (int i = 0; i < attempts; i++) {
         for (int i = 0; i < maxn; i++) {
             adj[i] = BITSET_INIT;
         }
 
         int n = randrange(core.size + 1, maxn);
-        int max_tries = n * n; // # times we try to find a neighbour
         int ok = 1;
         graph_clear(g);
 
@@ -47,11 +46,17 @@ int extend_core(graph core, int maxn, int delta, int attempts, int* allowed, gra
                 adj[v] = bitset_set(adj[v], u, e != -1);
             }
 
+        // Keep track of available nodes (those with allowed[u] != 0)
+        bitset nodes = (((bitset) 1) << n) - 1;
+
         // For the existing core
-        for (int u = 0; u < core.size; u++)
+        for (int u = 0; u < core.size; u++) {
             allowed[u] = delta - bitset_count(adj[u]);
+            nodes = bitset_set(nodes, u, allowed[u] > 0);
+        }
 
         // New nodes
+        // don't need to update nodes here, since allowed > 0
         for (int u = core.size; u < n; u++)
             allowed[u] = randrange(1, delta - 1);
 
@@ -59,23 +64,31 @@ int extend_core(graph core, int maxn, int delta, int attempts, int* allowed, gra
         for (int u = core.size; u < n; u++) {
             if (allowed[u] == 0) continue;
             int core_count = randrange(1, allowed[u]); // # core nodes
+            int m = allowed[u];
 
-            for (int i = 0; i < allowed[u]; i++) {
+            for (int i = 0; i < m; i++) {
                 int need_core = i < core_count;
-                int min = need_core ? 0             : core.size;
-                int max = need_core ? core.size - 1 : n - 1;
-                for (int a = 0; a < max_tries; a++) {
-                    int v = randrange(min, max);
-                    if (u == v || allowed[v] == 0 || bitset_test(adj[u], v)) continue;
-                    // Otherwise add this link
-                    graph_set(g, u, v, 0);
-                    allowed[u]--;
-                    allowed[v]--;
-                    adj[u] = bitset_set(adj[u], v, 1);
-                    adj[v] = bitset_set(adj[v], u, 1);
-                    break;
-                }
+                bitset peers = bitset_intersection(bitset_set(~adj[u], u, 0), nodes);
+
+                // core_m = # peers available <= core.size
+                int core_m = bitset_count(bitset_intersection(peers, core_adj));
+                int min = need_core ? 0          : core_m;
+                int max = need_core ? core_m - 1 : bitset_count(peers) - 1;
+                if (min > max) continue;
+
+                int v = bitset_nthset(peers, randrange(min, max));
+                /* assert(v != -1 && allowed[v] != 0); */
+                graph_set(g, u, v, 0);
+                allowed[u]--;
+                allowed[v]--;
+                if (allowed[v] == 0)
+                    nodes = bitset_set(nodes, v, 0);
+                adj[u] = bitset_set(adj[u], v, 1);
+                adj[v] = bitset_set(adj[v], u, 1);
             }
+
+            if (allowed[u] == 0)
+                nodes = bitset_set(nodes, u, 0);
         }
 
         // Check that it's valid!

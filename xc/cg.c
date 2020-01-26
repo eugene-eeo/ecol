@@ -196,7 +196,7 @@ int main(int argc, char* argv[]) {
                 graph6_write_bytes(g, n, buf);
                 buf[b] = '\n';
 
-                write(1, buf, b+1);
+                fwrite(buf, sizeof(char), b+1, stdout);
             }
         }
         graph_free(&core);

@@ -15,7 +15,6 @@
 #include "graph6.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <getopt.h>
 
 typedef struct {
@@ -217,7 +216,7 @@ int main(int argc, char* argv[]) {
             (delta == 0      || gc.delta == delta)
         ;
         if (valid)
-            write(1, line, nbytes);
+            fwrite(line, sizeof(char), nbytes, stdout);
     }
 
     return 0;

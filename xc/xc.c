@@ -11,7 +11,6 @@
  */
 
 #define  _GNU_SOURCE
-#include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -118,6 +117,6 @@ int main(int argc, char* argv[]) {
         }
 
         if (!class1)
-            write(1, line, nbytes);
+            fwrite(line, sizeof(char), nbytes, stdout);
     }
 }

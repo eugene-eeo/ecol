@@ -24,7 +24,6 @@ int vizing_heuristic(graph* g, int* P, int delta) {
     int w = -1;
     int v_0 = -1;
     int beta = 0;
-    bitset S = BITSET_INIT;
 
     while (g->num_uncoloured > 0) {
         if (taboo == 0) {
@@ -34,7 +33,7 @@ int vizing_heuristic(graph* g, int* P, int delta) {
         }
 
         // Clear
-        S = bitset_intersection(g->free[w], g->free[v_0]);
+        bitset S = bitset_intersection(g->free[w], g->free[v_0]);
         if (S) {
             int colour = bitset_first(S);
             graph_set(g, w, v_0, colour);

@@ -6,7 +6,6 @@
  */
 
 #define  _GNU_SOURCE
-#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -29,7 +28,7 @@ int main(int argc, char* argv[]) {
 
     while ((nbytes = getline(&line, &size, stdin)) > 0) {
         if (n == res)
-            write(1, line, nbytes);
+            fwrite(line, sizeof(char), nbytes, stdout);
         n++;
         if (n == mod)
             n = 0;

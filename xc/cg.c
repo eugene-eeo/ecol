@@ -131,7 +131,7 @@ int main(int argc, char* argv[]) {
     int delta = 0;
     int nodes_per_semicore = 0;
     int semicores_per_core = 100;
-    int seed = time(NULL) ^ getpid();
+    int seed = (unsigned) time(NULL) * getpid();
     int attempts = 10000;
 
     while ((opt = getopt(argc, argv, "hS:a:n:N:d:")) != -1) {

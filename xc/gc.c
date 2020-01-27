@@ -10,12 +10,13 @@
  */
 
 #define  _GNU_SOURCE
-#include "bitset.h"
-#include "graph.h"
-#include "graph6.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
+
+#include "bitset.h"
+#include "graph.h"
+#include "graph6.h"
 
 typedef struct {
     graph* g;

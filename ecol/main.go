@@ -3,6 +3,8 @@ package main
 import "flag"
 
 func main() {
+	erdos_renyi_task()
+	return
 	// for n := 0; n <= 200; n++ {
 	// 	G := complete_graph(n)
 	// 	vizing_heuristic(G)

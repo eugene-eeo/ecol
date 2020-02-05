@@ -119,4 +119,7 @@ int main(int argc, char* argv[]) {
         if (!class1)
             fwrite(line, sizeof(char), nbytes, stdout);
     }
+
+    fflush(stdout);
+    return 0;
 }

@@ -220,5 +220,6 @@ int main(int argc, char* argv[]) {
             fwrite(line, sizeof(char), nbytes, stdout);
     }
 
+    fflush(stdout);
     return 0;
 }

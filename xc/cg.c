@@ -46,7 +46,7 @@ int extend_core(graph core, int maxn, int delta, int attempts, int* allowed, gra
                 adj[v] = bitset_set(adj[v], u, e != -1);
             }
 
-        // Keep track of available nodes (those with allowed[u] != 0)
+        // Keep track of nodes with allowed[u] != 0
         bitset nodes = (((bitset) 1) << n) - 1;
 
         // For the existing core
@@ -178,7 +178,7 @@ int main(int argc, char* argv[]) {
         graph core = graph_create(gs.size);
         graph6_write_graph(line, gs.cursor, gs.size, &core);
 
-        if (core.size + 1 < nodes_per_semicore) {
+        if (core.size < nodes_per_semicore) {
             for (int i = 0; i < semicores_per_core; i++) {
                 int n = extend_core(core, nodes_per_semicore, delta, attempts, allowed, &g, adj);
                 if (!n)
@@ -202,7 +202,9 @@ int main(int argc, char* argv[]) {
         graph_free(&core);
     }
 
+    fflush(stdout);
     graph_free(&g);
     free(allowed);
     free(adj);
+    return 0;
 }

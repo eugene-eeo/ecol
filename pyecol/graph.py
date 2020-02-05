@@ -21,6 +21,15 @@ class Graph:
         self.edge_data[x][y] = data
         self.edge_data[y][x] = data
 
+    def __delitem__(self, edge):
+        x, y = edge
+        self[x, y] = False
+
+    def copy(self):
+        g = Graph(self.n)
+        g.edge_data = [row[:] for row in self.edge_data]
+        return g
+
     def nodes(self):
         return range(self.n)
 

@@ -23,3 +23,7 @@ ecol/ecol
 /results/
 /xc/cg
 /tmp/
+/data/*.jsonl
+/data/*.g6
+/data/tmp/
+/data/*_core/

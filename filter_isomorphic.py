@@ -10,7 +10,7 @@ def get_adj_dict(edge_data):
     d = {}
     n = len(edge_data)
     for i, row in enumerate(edge_data):
-        d[i] = [j for j in range(i + 1, n) if row[j] == 0]
+        d[i] = [j for j in range(i + 1, n) if row[j] != -1]
     return d
 
 

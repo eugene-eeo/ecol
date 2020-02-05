@@ -33,10 +33,8 @@ void graph6_write_graph(char* data, int cursor, int size, graph* g) {
 int graph6_get_bytes_needed(int n) {
     // N(x)
     int N = 1;
-    // R(X)
-    // length = ceil(k / 6)
     int edges = (n * (n - 1)) / 2;
-    int R = edges / 6 + (edges % 6 > 0);
+    int R = edges / 6 + (edges % 6 > 0); // R(X) = ceil(#edges / 6)
     return N + R;
 }
 

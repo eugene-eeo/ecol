@@ -101,7 +101,7 @@ def max_degree(G: Graph):
     return max(G.degree(n) for n in G.nodes())
 
 
-def plot_graph(G: Graph, with_labels=True):
+def plot_graph(G: Graph, with_labels=True, node_label="node_num", core_same_rank=True, nice_core=False):
     dot = graphviz.Graph()
     # dot.graph_attr['rankdir'] = 'LR'
     # dot.graph_attr['ratio'] = '0.95'
@@ -111,21 +111,42 @@ def plot_graph(G: Graph, with_labels=True):
     degrees = {x: G.degree(x) for x in G.nodes()}
     core = {x for x in degrees if degrees[x] == delta}
 
-    with dot.subgraph() as s:
-        s.attr(rank='same')
-        s.attr('node', style='solid,filled', color='black', fillcolor='grey')
-        for node in core:
-            s.node(str(node), str(node))
+    def get_label(node):
+        if node_label == "node_num":
+            return str(node)
+        return str(degrees[node])
+
+    if nice_core:
+        core_nodes = set(core)
+        adj = {x: set(G.neighbours(x)) & set(core_nodes) for x in core}
+        values = set(len(adj[x]) for x in adj)
+        for deg in sorted(values):
+            with dot.subgraph() as s:
+                s.attr(rank='same')
+                s.attr('node', style='solid,filled', color='black', fillcolor='grey')
+                for node in core:
+                    if len(adj[node]) == deg:
+                        s.node(str(node), get_label(node))
+
+    else:
+        with dot.subgraph() as s:
+            if core_same_rank:
+                s.attr(rank='same')
+            s.attr('node', style='solid,filled', color='black', fillcolor='grey')
+            for node in core:
+                s.node(str(node), get_label(node))
 
     for node in nodes - core:
-        dot.node(str(node), str(node))
+        dot.node(str(node), get_label(node))
 
     for u, v in G.edges():
         if with_labels:
             dot.edge(str(u), str(v), label=str(G[u, v]))
         else:
             dot.edge(str(u), str(v))
-    graph_class = 1 if colours_used(G) == delta else 2
+
+    colours = colours_used(G)
+    graph_class = 1 if colours == delta else (2 if colours == delta+1 else '?')
     deg_seq = sorted(degrees.values())
     dot.attr(label=rf'Δ = {delta}\nClass {graph_class}\n{deg_seq}')
     return dot

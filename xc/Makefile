@@ -3,7 +3,7 @@ CFLAGS= -std=c99 -Ofast -march=native -finline-functions -flto -funroll-loops -m
 XC_CFLAGS= -D 'XC_GRAPH_COLOUR=1'
 DEBUG_CFLAGS= -std=c99 -O0 -march=native -g -mbmi2
 
-all: xc_ gc_ resmod_ cg_
+all: xc_ gc_ resmod_ cg_ special_
 
 check:
 	cppcheck *.c *.h
@@ -22,6 +22,9 @@ gc_:
 
 cg_:
 	$(CC) $(CFLAGS) -o cg cg.c graph.c bitset.c graph6.c
+
+special_:
+	$(CC) $(CFLAGS) -o special special.c graph.c bitset.c graph6.c
 
 resmod_:
 	$(CC) $(CFLAGS) -o resmod resmod.c

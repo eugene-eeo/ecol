@@ -19,13 +19,21 @@
 #include "graph6.h"
 #include "bitset.h"
 
+#define max(a, b) ((a) > (b) ? (a) : (b))
+
 // get a random number in the range of [m,n]
 int randrange(int m, int n) {
     return m + rand() / (RAND_MAX / (n - m + 1) + 1);
 }
 
 // extend core
-int extend_core(graph core, int maxn, int delta, int attempts, int* allowed, graph* g, bitset* adj) {
+int extend_core(graph core, int maxn, int delta, int attempts, int* allowed, graph* g, bitset* adj, int proper_major) {
+    // Minimum size of any graph
+    int minn = max(core.size + 1, delta + 1);
+    if (minn > maxn) {
+        return 0;
+    }
+
     // Bitset where bits 0..core.size-1 are all set
     bitset core_adj = (((bitset) 1) << core.size) - 1;
     for (int i = 0; i < attempts; i++) {
@@ -33,7 +41,7 @@ int extend_core(graph core, int maxn, int delta, int attempts, int* allowed, gra
             adj[i] = BITSET_INIT;
         }
 
-        int n = randrange(core.size + 1, maxn);
+        int n = randrange(minn, maxn);
         int ok = 1;
         graph_clear(g);
 
@@ -105,18 +113,40 @@ int extend_core(graph core, int maxn, int delta, int attempts, int* allowed, gra
             }
         }
 
+        // Only do this check if we passed the previous one, and we need
+        // to generate graphs with proper majors...
+        if (ok && proper_major) {
+            // Check if we have a proper major
+            // Proper major = core node x s.t.:
+            //  sum(∆ - deg(u)) <= ∆ - 2 (for all neighbours u of x)
+            ok = 0;
+            for (int u = 0; u < core.size; u++) {
+                int sum = 0;
+                for (int v = 0; v < n; v++) {
+                    if (bitset_test(adj[u], v) == 1) {
+                        sum += bitset_count(adj[v]);
+                    }
+                }
+                if (sum <= delta - 2) {
+                    ok = 1;
+                    break;
+                }
+            }
+        }
+
         if (ok) return n;
     }
     return 0;
 }
 
 static const char* help =
-    "usage: cg [-h] [-S#] [-a#] [-n#] -N# -d#\n"
+    "usage: cg [-h] [-S#] [-a#] [-n#] [-p] -N# -d#\n"
     "\n"
     "options:\n"
     "    -S# seed rng (default = time.time)\n"
     "    -a# attempts (default = 10000)\n"
     "    -d# degree of semicores\n"
+    "    -p  generated graph should contain a proper major\n"
     "    -N# max number of nodes per semicore\n"
     "    -n# number of random semicores per core (default = 100)\n"
     "    -h  help message\n";
@@ -133,14 +163,18 @@ int main(int argc, char* argv[]) {
     int semicores_per_core = 100;
     int seed = (unsigned) time(NULL) * getpid();
     int attempts = 10000;
+    int proper_major = 0;
 
-    while ((opt = getopt(argc, argv, "hS:a:n:N:d:")) != -1) {
+    while ((opt = getopt(argc, argv, "hpS:a:n:N:d:")) != -1) {
         switch (opt) {
             case 'h':
                 showhelp(0);
                 break;
             case 'd':
                 delta = atoi(optarg);
+                break;
+            case 'p':
+                proper_major = 1;
                 break;
             case 'N':
                 nodes_per_semicore = atoi(optarg);
@@ -180,7 +214,7 @@ int main(int argc, char* argv[]) {
 
         if (core.size < nodes_per_semicore && graph_max_degree(&core) <= delta) {
             for (int i = 0; i < semicores_per_core; i++) {
-                int n = extend_core(core, nodes_per_semicore, delta, attempts, allowed, &g, adj);
+                int n = extend_core(core, nodes_per_semicore, delta, attempts, allowed, &g, adj, proper_major);
                 if (!n)
                     continue;
                 int b = graph6_get_bytes_needed(n);

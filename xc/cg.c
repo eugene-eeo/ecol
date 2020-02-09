@@ -124,7 +124,7 @@ int extend_core(graph core, int maxn, int delta, int attempts, int* allowed, gra
                 int sum = 0;
                 for (int v = 0; v < n; v++) {
                     if (bitset_test(adj[u], v) == 1) {
-                        sum += bitset_count(adj[v]);
+                        sum += delta - bitset_count(adj[v]);
                     }
                 }
                 if (sum <= delta - 2) {

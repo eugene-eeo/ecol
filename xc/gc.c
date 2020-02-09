@@ -94,7 +94,7 @@ int check_core_delta(graphcheck* gc, int deg) {
     return max == deg;
 }
 
-int check_valid_semicore(graphcheck *gc) {
+int check_valid_semicore(graphcheck* gc) {
     // Check that all nodes in graph are either a
     // core node, or have a core node as neighbour
     for (int u = 0; u < gc->g->size; u++) {
@@ -103,6 +103,25 @@ int check_valid_semicore(graphcheck *gc) {
         }
     }
     return 1;
+}
+
+int has_proper_major(graphcheck* gc) {
+    // Check that graph has a proper major
+    // i.e. core node x s.t.:
+    //   sum(∆ - deg(u)) <= ∆ - 2 (for all neighbours u of x)
+    int n = bitset_count(gc->core);
+    for (int i = 0; i < n; i++) {
+        int u = bitset_nthset(gc->core, i);
+        int m = gc->degree[u];
+        int sum = 0;
+        for (int j = 0; j < m; j++) {
+            int v = bitset_nthset(gc->adj[u], j);
+            sum += gc->delta - gc->degree[v];
+        }
+        if (sum <= gc->delta - 2)
+            return 1;
+    }
+    return 0;
 }
 
 int dfs(int u, bitset* visited, graph g, int parent) {
@@ -127,12 +146,13 @@ int has_cycle(graph g) {
 }
 
 static const char* help =
-    "usage: gc [-d#] [-s] [-c] [-D#] [-o|-u] [-h]\n"
+    "usage: gc [-d#] [-s] [-c] [-p] [-D#] [-o|-u] [-h]\n"
     "\n"
     "options:\n"
     "    -d# degree of core (0 = no check)\n"
     "    -s  check if valid semicore\n"
     "    -c  check if graph contains cycle\n"
+    "    -p  check if graph contains a proper major\n"
     "    -D# graph delta (0 = no check)\n"
     "    -o  only overfull\n"
     "    -u  only underfull\n"
@@ -151,8 +171,9 @@ int main(int argc, char* argv[]) {
     int overfull = 0;
     int underfull = 0;
     int contains_cycle = 0;
+    int proper_major = 0;
 
-    while ((opt = getopt(argc, argv, "hd:scD:ou")) != -1) {
+    while ((opt = getopt(argc, argv, "hd:scD:oup")) != -1) {
         switch (opt) {
             case 'h':
                 showhelp(0);
@@ -175,14 +196,17 @@ int main(int argc, char* argv[]) {
             case 'u':
                 underfull = 1;
                 break;
+            case 'p':
+                proper_major = 1;
+                break;
         }
     }
 
-    if (!contains_cycle && !core_delta && !semicore && !delta && !overfull && !underfull)
+    if (!contains_cycle && !core_delta && !semicore && !delta && !overfull && !underfull && !proper_major)
         showhelp(1);
 
-    // Whether we need allocations for adj and core
-    int need_advanced = core_delta || semicore;
+    // Whether we need allocations for adj, deg, and core
+    int need_advanced = core_delta || semicore || proper_major;
 
     // Main loop
     // graph
@@ -213,6 +237,7 @@ int main(int argc, char* argv[]) {
             (!underfull      || !gc.overfull) &&
             (!contains_cycle || has_cycle(g)) &&
             (!semicore       || check_valid_semicore(&gc)) &&
+            (!proper_major   || has_proper_major(&gc)) &&
             (core_delta == 0 || check_core_delta(&gc, core_delta)) &&
             (delta == 0      || gc.delta == delta)
         ;

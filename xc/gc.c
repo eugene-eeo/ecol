@@ -98,7 +98,7 @@ int check_valid_semicore(graphcheck *gc) {
     // Check that all nodes in graph are either a
     // core node, or have a core node as neighbour
     for (int u = 0; u < gc->g->size; u++) {
-        if (bitset_count(gc->adj[u]) != gc->delta && !bitset_intersection(gc->core, gc->adj[u])) {
+        if (gc->degree[u] != gc->delta && !bitset_intersection(gc->core, gc->adj[u])) {
             return 0;
         }
     }
@@ -178,11 +178,11 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    if (contains_cycle == 0 && core_delta == 0 && semicore == 0 && delta == 0 && overfull == 0 && underfull == 0)
+    if (!contains_cycle && !core_delta && !semicore && !delta && !overfull && !underfull)
         showhelp(1);
 
-    // Whether we need allocations for delta, adj, core
-    int need_advanced = delta || core_delta || semicore;
+    // Whether we need allocations for adj and core
+    int need_advanced = core_delta || semicore;
 
     // Main loop
     // graph

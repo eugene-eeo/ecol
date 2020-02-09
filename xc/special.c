@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <getopt.h>
 
 #include "graph.h"
 #include "graph6.h"
@@ -39,14 +40,68 @@ void cycle_path_graph(int n, graph* g) {
 
 // ==========
 
-int main() {
-    graph g = graph_create(cycle_path_graph_size(30));
+// ==========
+// Path-Path Graph Family:
+//    G(n) = nP1 * (n-1)P1
+
+int path_path_graph_size(int n) {
+    return n + n - 1;
+}
+
+void path_path_graph(int n, graph* g) {
+    // Join
+    int end = path_path_graph_size(n);
+    for (int u = 0; u < n; u++) {
+        for (int v = n; v < end; v++) {
+            graph_set(g, u, v, 0);
+        }
+    }
+}
+
+// ==========
+
+static char* help =
+    "usage: special [-h] [-p | -c]\n"
+    "\n"
+    "options:\n"
+    "    -h   help message\n"
+    "    -p   path-path family  G(n) = nP1 * (n-1)P1\n"
+    "    -c   path-cycle family G(n) = Cn * (n-1)P1\n";
+
+int showhelp(int code) {
+    printf("%s", help);
+    exit(code);
+}
+
+int main(int argc, char* argv[]) {
+    int path_path = 0;
+    int path_cycle = 0;
+
+    int opt;
+    while ((opt = getopt(argc, argv, "hpc")) != -1) {
+        switch (opt) {
+            case 'h':
+                showhelp(0);
+                break;
+            case 'p': path_path = 1; break;
+            case 'c': path_cycle = 1; break;
+        }
+    }
+
+    if (!path_path && !path_cycle)
+        showhelp(1);
+
+    int size = path_path ? path_path_graph_size(30) : cycle_path_graph_size(30);
+    graph g = graph_create(size);
     char* buf = calloc(graph6_get_bytes_needed(g.size) + 1, sizeof(char));
 
     for (int n = 3; n <= 30; n++) {
-        cycle_path_graph(n, &g);
+        if (path_path)
+            path_path_graph(n, &g);
+        else
+            cycle_path_graph(n, &g);
 
-        int m = cycle_path_graph_size(n);
+        int m = path_path ? path_path_graph_size(n) : cycle_path_graph_size(n);
         int b = graph6_get_bytes_needed(m);
 
         memset(buf, 0, b);
@@ -60,5 +115,6 @@ int main() {
 
     fflush(stdout);
     free(buf);
+    graph_free(&g);
     return 0;
 }

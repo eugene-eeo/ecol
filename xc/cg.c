@@ -178,7 +178,7 @@ int main(int argc, char* argv[]) {
         graph core = graph_create(gs.size);
         graph6_write_graph(line, gs.cursor, gs.size, &core);
 
-        if (core.size < nodes_per_semicore) {
+        if (core.size < nodes_per_semicore && graph_max_degree(&core) <= delta) {
             for (int i = 0; i < semicores_per_core; i++) {
                 int n = extend_core(core, nodes_per_semicore, delta, attempts, allowed, &g, adj);
                 if (!n)

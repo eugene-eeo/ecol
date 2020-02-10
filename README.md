@@ -19,3 +19,17 @@
     myciel5      23     23    23    23
     myciel6      47     47    47    47
     myciel7      95     95    95    95
+
+# Bad cores
+
+ - `K_n` (even n, n >= 4) is always bad core
+ - `K_n` (odd n, n >= 5) is always bad core (but can't find common substructure)
+ - `nP * (n-1)P1` not a bad core
+
+# HZ
+
+ - `Δ=4`, K5-e == 2P1 * C3
+ - `Δ=5`, 3P1 * C4
+ - `Δ=6`, 4P1 * C5, C4 * C3
+ - `Δ=7`, 5P1 * C6, C5 * C4, 5P1 * (C3 + C3)
+ - `Δ=8`, ...

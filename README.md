@@ -25,10 +25,10 @@
  - `K_n` (even n, n >= 4) is always bad core.
  - `K_n` (odd n, n >= 5) is always bad core (but can't find common substructure),
  but degree sequence looks like:
-   - `n=5`: 1, `(n+1)^4, (n+2)^5` == [1, 6, 6, 6, 6, 7, 7, 7, 7, 7]
-   - `n=7`: 1, `(n)^2, (n+1)^2, (n+2)^7`
-   - `n=9`: 1, `(n)^2, (n+1)^2, (n+2)^9`
-   - `n=m`: 1, `(n)^2, (n+1)^2, (n+2)^n` (?) Conjecture.
+   - `n=5`: `1, (n+1)^4, (n+2)^5` == [1, 6, 6, 6, 6, 7, 7, 7, 7, 7]
+   - `n=7`: `1, (n)^2, (n+1)^2, (n+2)^7`
+   - `n=9`: `1, (n)^2, (n+1)^2, (n+2)^9`
+   - `n=m`: `1, (n)^2, (n+1)^2, (n+2)^n` (?) Conjecture.
  - `nP * (n-1)P1` not a bad core
 
 # HZ

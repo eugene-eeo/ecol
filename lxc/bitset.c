@@ -7,6 +7,7 @@
  */
 
 #include <stdlib.h>
+#include <x86intrin.h>
 #include "bitset.h"
 
 // Tiny Bitsets (<= 64 values)
@@ -45,6 +46,11 @@ int bst_count(bs_tiny a) {
 // Find first set bit
 int bst_first(bs_tiny a) {
     return __builtin_ffsl(a) - 1;
+}
+
+// Find the position of the nth bit set
+int bst_nthset(bs_tiny a, int n) {
+    return __builtin_ffsl(_pdep_u64(1ULL << n, a)) - 1;
 }
 
 
@@ -98,6 +104,13 @@ void bitset_union(bitset* dst, bitset* other) {
         dst->B[i] = BST_INIT;
 }
 
+int bitset_any(bitset* bs) {
+    for (int i = 0; i < bs->len; i++)
+        if (bs->B[i])
+            return 1;
+    return 0;
+}
+
 int bitset_count(bitset* bs) {
     int count = 0;
     for (int i = 0; i < bs->len; i++)
@@ -119,4 +132,17 @@ int bitset_first(bitset* bs) {
 void bitset_clear(bitset* bs) {
     for (int i = 0; i < bs->len; i++)
         bs->B[i] = BST_INIT;
+}
+
+int bitset_nthset(bitset* bs, int n) {
+    int run = 0;
+    for (int i = 0; i < bs->len; i++) {
+        bs_tiny b = bs->B[i];
+        int count = bst_count(b);
+        if (count + run >= n) {
+            return bst_nthset(b, n - run);
+        }
+        run += count;
+    }
+    return -1;
 }

@@ -21,7 +21,9 @@ void bitset_intersection(bitset* dst, bitset *other);
 void bitset_union(bitset* dst, bitset* other);
 void bitset_clear(bitset* bs);
 
+int bitset_any(bitset* bs);
 int bitset_count(bitset* bs);
 int bitset_first(bitset* bs);
+int bitset_nthset(bitset* bs, int n);
 
 #endif /* BITSET_H */

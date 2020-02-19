@@ -9,7 +9,17 @@
 #include "bitset.h"
 #include "graph.h"
 #include "vizing_heuristic.h"
-#include <stdio.h>
+#include <stdlib.h>
+
+// get a random number in the range of [m,n]
+int randrange(int m, int n) {
+    return m + rand() / (RAND_MAX / (n - m + 1) + 1);
+}
+
+int sample(bitset* bs) {
+    int n = bitset_count(bs);
+    return bitset_nthset(bs, randrange(0, n - 1));
+}
 
 int vizing_heuristic(graph* g, int* P, int delta, bitset* S) {
     bitset_clear(S);
@@ -39,8 +49,8 @@ int vizing_heuristic(graph* g, int* P, int delta, bitset* S) {
         bitset_copy(S, &g->free[w]);
         bitset_intersection(S, &g->free[v_0]);
 
-        if (bitset_count(S) > 0) {
-            int colour = bitset_first(S);
+        if (bitset_any(S)) {
+            int colour = sample(S);
             graph_set(g, w, v_0, colour);
             taboo = 0;
         } else {
@@ -48,7 +58,7 @@ int vizing_heuristic(graph* g, int* P, int delta, bitset* S) {
             bitset_copy(S, &g->free[v_0]);
             bitset_set(S, taboo, 0);
 
-            if (bitset_count(S) == 0) {
+            if (!bitset_any(S)) {
                 /* for (int i = 0; i < g->size; i++) { */
                 /*     bitset_set(&g->free[i], delta + 1, 1); */
                 /* } */
@@ -56,9 +66,9 @@ int vizing_heuristic(graph* g, int* P, int delta, bitset* S) {
                 /* taboo = 0; */
                 return 2;
             } else {
-                int alpha = bitset_first(S);
+                int alpha = sample(S);
                 if (taboo == 0) {
-                    beta = bitset_first(&g->free[w]);
+                    beta = sample(&g->free[w]);
                 }
                 int len = get_path(g, v_0, beta, alpha, P);
                 if (P[len-1] != w) {

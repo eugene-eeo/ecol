@@ -1,4 +1,4 @@
-/*
+    /*
  * lxc.c
  * =====
  *
@@ -93,7 +93,7 @@ int main(int argc, char* argv[]) {
         int* ed = calloc(g.size * g.size, sizeof(int)); // Edge data for remap
         init_map(map, g.size);
 
-        graph6_write_graph(line, gs.cursor, gs.size, &g);
+        graph6_read_graph(line, gs.cursor, gs.size, &g);
 
         int class1 = 0;
         int delta = graph_max_degree(&g);

@@ -1,5 +1,3 @@
-// Only handles graphs of size <= 62
-
 #include "graph.h"
 #include "graph6.h"
 #include <stdio.h>
@@ -32,7 +30,7 @@ graph6_state graph6_get_size(char* data) {
     return s;
 }
 
-void graph6_write_graph(char* data, int cursor, int size, graph* g) {
+void graph6_read_graph(char* data, int cursor, int size, graph* g) {
     int k = 0;
     for (int v = 0; v < size; v++) {
         for (int u = 0; u < v; u++) {

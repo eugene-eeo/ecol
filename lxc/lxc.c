@@ -68,6 +68,7 @@ void init_map(int* map, int size) {
 
 int main(int argc, char* argv[]) {
     int ATTEMPTS = 15;
+    srand(17021997);
 
     if (argc == 2)
         ATTEMPTS = atoi(argv[1]);

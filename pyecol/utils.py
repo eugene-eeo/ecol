@@ -174,7 +174,7 @@ def dmacs2graph(stream):
         line = line.strip()
         if line.startswith('p'):
             _, format, nodes, _ = line.split()
-            assert format.lower() == 'edge'
+            assert format.lower().startswith('edge')
             n = int(nodes)
             g = Graph(n)
         elif line.startswith('e'):

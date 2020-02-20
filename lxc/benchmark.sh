@@ -1,5 +1,7 @@
 #!/bin/sh
 for file in pts/*.pt; do
-    output=$(./lxc -p -a20 < "$file")
-    echo "$file,$output"
+    if [ "$file" != "pts/qg.order100.pt" ]; then
+        output=$(./lxc -p -a1 < "$file")
+        echo "$file,$output"
+    fi
 done

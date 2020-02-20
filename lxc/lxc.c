@@ -1,4 +1,4 @@
-    /*
+/*
  * lxc.c
  * =====
  *
@@ -12,12 +12,44 @@
 #define  _GNU_SOURCE
 #include <stdlib.h>
 #include <stdio.h>
-#include <stdint.h>
+#include <getopt.h>
 
 #include "bitset.h"
 #include "graph.h"
 #include "graph6.h"
 #include "vizing_heuristic.h"
+
+// Plaintext stream
+// where graph is represented as n lines of n characters (0/1)
+graph pt_read_stream(FILE* f) {
+    // IO
+    char* line = NULL;
+    size_t size = 0;
+    ssize_t nbytes = 0;
+
+    // Graph
+    int u = 0;
+    graph g;
+
+    while ((nbytes = getline(&line, &size, f)) > 0) {
+        if (u == 0) {
+            g = graph_create(nbytes);
+        }
+        for (int i = 0; i < nbytes; i++) {
+            if (line[i] == '1' || line[i] == '0') {
+                g.edges[u * g.size + i] = line[i] == '1' ? 0 : -1;
+                if (line[i] == '1')
+                    g.num_uncoloured++;
+            }
+        }
+        u++;
+        if (u == g.size)
+            break;
+    }
+
+    g.num_uncoloured = g.num_uncoloured / 2;
+    return g;
+}
 
 // xorshift prng
 typedef struct xorshift64s_state {
@@ -66,15 +98,81 @@ void init_map(int* map, int size) {
         map[i] = i;
 }
 
-int main(int argc, char* argv[]) {
-    int ATTEMPTS = 15;
-    srand(17021997);
+static const char* help =
+    "usage: lxc [-a#] [-p] [-h]\n"
+    "\n"
+    "options:\n"
+    "    -a# number of attempts (default: 15)\n"
+    "    -p  plaintext format (default graph6)\n"
+    "    -h  help message\n";
 
-    if (argc == 2)
-        ATTEMPTS = atoi(argv[1]);
+int showhelp(int code) {
+    printf("%s", help);
+    exit(code);
+}
+
+int main(int argc, char* argv[]) {
+    srand(17021997);
+    int opt;
+    int pt;
+    int attempts = 15;
+
+    while ((opt = getopt(argc, argv, "ha:p")) != -1) {
+        switch (opt) {
+            case 'h':
+                showhelp(0);
+                break;
+            case 'a':
+                attempts = atoi(optarg);
+                break;
+            case 'p':
+                pt = 1;
+                break;
+        }
+    }
 
     // Remap
     xorshift64s_state state = { 42 };
+
+    if (pt) {
+        graph g = pt_read_stream(stdin);
+        int* P = allocate_path_array(&g);
+
+        // For remap
+        int* map = calloc(g.size, sizeof(int));
+        int* ed = calloc(g.size * g.size, sizeof(int)); // Edge data for remap
+        init_map(map, g.size);
+
+        int delta = graph_max_degree(&g);
+        bitset S = bitset_new(delta + 2);
+
+        // do colouring
+        graph_init(&g);
+        int num_uncoloured = g.num_uncoloured;
+
+        int class1 = 0;
+        int class2 = 0;
+
+        for (int a = 0; a < attempts; a++) {
+            int class = vizing_heuristic(&g, P, delta, &S);
+            switch (class) {
+                case 1: class1++; break;
+                case 2: class2++; break;
+            }
+            remap(&state, map, ed, &g, num_uncoloured);
+        }
+
+        printf("class1: %f\n", ((double) class1) / attempts);
+        printf("class2: %f\n", ((double) class2) / attempts);
+
+        bitset_free(&S);
+        free(P);
+        free(map);
+        free(ed);
+
+        graph_free(&g);
+        exit(0);
+    }
 
     // IO
     char* line = NULL;
@@ -102,7 +200,7 @@ int main(int argc, char* argv[]) {
         if (g.num_uncoloured <= delta * (g.size / 2)) {
             graph_init(&g);
             int num_uncoloured = g.num_uncoloured;
-            for (int a = 0; a < ATTEMPTS; a++) {
+            for (int a = 0; a < attempts; a++) {
                 class1 = vizing_heuristic(&g, P, delta, &S) == 1;
                 if (class1)
                     break;

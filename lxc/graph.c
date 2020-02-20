@@ -120,15 +120,6 @@ int graph_max_degree(graph* g) {
     return delta;
 }
 
-// Clear a graph
-void graph_clear(graph *g) {
-    g->num_uncoloured = 0;
-    int N = g->size * g->size;
-    for (int i = 0; i < N; i++) {
-        g->edges[i] = -1;
-    }
-}
-
 
 // Utilities
 int* allocate_path_array(graph* g) {
@@ -174,31 +165,20 @@ void switch_path(graph* g, int* path, int length, int alpha, int beta) {
 }
 
 int verify_colouring(graph *g) {
-    bitset b = bitset_new(graph_max_degree(g) + 2);
-    int rv = 1;
     for (int i = 0; i < g->size; i++) {
-        int n = 0;
-        int m = i * g->size;
-        bitset_clear(&b);
-        for (int j = 0; j < g->size; j++) {
-            int colour = g->edges[m + j];
-            if (colour == 0) {
-                rv = 0;
-                goto destroy;
+        for (int j = i+1; j < g->size; j++) {
+            // Check if (i, j) exists
+            int c1 = graph_get(g, i, j);
+            if (c1 == -1) continue;
+            int k = i;
+            for (int l = j+1; l < g->size; l++) {
+                // we always return correct decision even if (k, l) == -1
+                if (graph_get(g, k, l) == c1)
+                    return 0;
             }
-            if (colour != -1) {
-                bitset_set(&b, colour, 1);
-                n++;
-            }
-        }
-        if (bitset_count(&b) != n) {
-            rv = 0;
-            goto destroy;
         }
     }
-destroy:
-    bitset_free(&b);
-    return rv;
+    return 1;
 }
 
 // Colours used in the graph

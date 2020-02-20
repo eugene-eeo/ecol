@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS= -std=c99 -Ofast -march=native -funroll-loops -mbmi2
+CFLAGS= -std=c99 -Ofast -march=native -funroll-loops -mbmi2 -finline-functions -flto
 DEBUG_CFLAGS= -std=c99 -O0 -march=native -g -mbmi2
 
 all: _lxc

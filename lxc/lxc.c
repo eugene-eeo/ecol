@@ -67,7 +67,7 @@ int showhelp(int code) {
 int main(int argc, char* argv[]) {
     srand(17021997);
     int opt;
-    int pt;
+    int pt = 0;
     int attempts = 15;
 
     while ((opt = getopt(argc, argv, "ha:p")) != -1) {
@@ -88,6 +88,7 @@ int main(int argc, char* argv[]) {
         graph g = pt_read_stream(stdin);
         int* P = allocate_path_array(&g);
 
+        int num_uncoloured = g.num_uncoloured;
         int delta = graph_max_degree(&g);
         bitset S = bitset_new(delta + 2);
 
@@ -96,10 +97,10 @@ int main(int argc, char* argv[]) {
 
         int class1 = 0;
         int class2 = 0;
-        int n = 0;
+        int m = 0;
 
         for (int a = 0; a < attempts; a++) {
-            n++;
+            m++;
             int class = vizing_heuristic(&g, P, delta, &S);
             switch (class) {
                 case 1: class1++; break;
@@ -107,12 +108,13 @@ int main(int argc, char* argv[]) {
             }
             if (class == 1)
                 break;
+            g.num_uncoloured = num_uncoloured;
             for (int i = 0; i < g.size * g.size; i++) {
-                g.edges[i] = g.edges[i] == -1 ? -1 : 0;
+                g.edges[i] = (g.edges[i] >= 0) ? 0 : -1;
             }
         }
 
-        printf("%f,%f\n", ((double) class1) / n, ((double) class2) / n);
+        printf("%f,%f\n", ((double) class1) / m, ((double) class2) / m);
 
         bitset_free(&S);
         free(P);
@@ -137,6 +139,7 @@ int main(int argc, char* argv[]) {
 
         int class1 = 0;
         int delta = graph_max_degree(&g);
+        int num_uncoloured = g.num_uncoloured;
         bitset S = bitset_new(delta + 2);
         // Only do colouring if graph is underfull
         if (g.num_uncoloured <= delta * (g.size / 2)) {
@@ -145,6 +148,7 @@ int main(int argc, char* argv[]) {
                 class1 = vizing_heuristic(&g, P, delta, &S) == 1;
                 if (class1)
                     break;
+                g.num_uncoloured = num_uncoloured;
                 for (int i = 0; i < g.size * g.size; i++) {
                     g.edges[i] = g.edges[i] == -1 ? -1 : 0;
                 }

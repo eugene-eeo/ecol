@@ -80,28 +80,18 @@ int bitset_test(bitset *bs, int pos) {
 }
 
 void bitset_copy(bitset* dst, bitset* src) {
-    // Copy
     for (int i = 0; i < src->len; i++)
         dst->B[i] = src->B[i];
-    // Set remainder to 0
-    for (int i = src->len; i < dst->len; i++)
-        dst->B[i] = BST_INIT;
 }
 
 void bitset_intersection(bitset* dst, bitset* other) {
     for (int i = 0; i < other->len; i++)
         dst->B[i] = bst_intersection(dst->B[i], other->B[i]);
-    // Set remainder to 0
-    for (int i = other->len; i < dst->len; i++)
-        dst->B[i] = BST_INIT;
 }
 
 void bitset_union(bitset* dst, bitset* other) {
     for (int i = 0; i < other->len; i++)
         dst->B[i] = bst_union(dst->B[i], other->B[i]);
-    // Set remainder to 0
-    for (int i = other->len; i < dst->len; i++)
-        dst->B[i] = BST_INIT;
 }
 
 int bitset_any(bitset* bs) {

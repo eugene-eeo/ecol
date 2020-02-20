@@ -11,14 +11,21 @@
 #include "vizing_heuristic.h"
 #include <stdlib.h>
 
-// get a random number in the range of [m,n]
-int randrange(int m, int n) {
-    return m + rand() / (RAND_MAX / (n - m + 1) + 1);
+static unsigned int g_seed = 15021997;
+
+static inline int vh_rand(void) {
+    g_seed = (214013*g_seed+2531011);
+    return (g_seed >> 16) & 0x7FFF;
+}
+
+// get a random number in the range of [0,n)
+int randrange(int n) {
+    return vh_rand() % n;
 }
 
 int sample(bitset* bs) {
     int n = bitset_count(bs);
-    return bitset_nthset(bs, randrange(0, n - 1));
+    return bitset_nthset(bs, randrange(n));
 }
 
 int vizing_heuristic(graph* g, int* P, int delta, bitset* S) {
@@ -64,6 +71,7 @@ int vizing_heuristic(graph* g, int* P, int delta, bitset* S) {
                 /* } */
                 /* graph_set(g, w, v_0, delta + 1); */
                 /* taboo = 0; */
+                /* class = 2; */
                 return 2;
             } else {
                 int alpha = sample(S);

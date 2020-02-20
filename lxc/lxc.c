@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <getopt.h>
+#include <time.h>
 
 #include "bitset.h"
 #include "graph.h"
@@ -94,18 +95,15 @@ int main(int argc, char* argv[]) {
 
         // do colouring
         graph_init(&g);
-
-        int class1 = 0;
-        int class2 = 0;
-        int m = 0;
+        int class = 2;
+        clock_t start, stop;
+        start = 0;
+        stop = 0;
 
         for (int a = 0; a < attempts; a++) {
-            m++;
-            int class = vizing_heuristic(&g, P, delta, &S);
-            switch (class) {
-                case 1: class1++; break;
-                case 2: class2++; break;
-            }
+            start = clock();
+            class = vizing_heuristic(&g, P, delta, &S);
+            stop = clock();
             if (class == 1)
                 break;
             g.num_uncoloured = num_uncoloured;
@@ -114,7 +112,7 @@ int main(int argc, char* argv[]) {
             }
         }
 
-        printf("%f,%f\n", ((double) class1) / m, ((double) class2) / m);
+        printf("%d,%.2f\n", (class == 1) ? delta : delta + 1, (double)(stop - start) / CLOCKS_PER_SEC);
 
         bitset_free(&S);
         free(P);

@@ -11,16 +11,11 @@
 #include "vizing_heuristic.h"
 #include <stdlib.h>
 
-static unsigned int g_seed = 15021997;
-
-static inline int vh_rand(void) {
-    g_seed = (214013*g_seed+2531011);
-    return (g_seed >> 16) & 0x7FFF;
-}
-
 // get a random number in the range of [0,n)
 int randrange(int n) {
-    return vh_rand() % n;
+    return rand() / (RAND_MAX / n + 1);
+    // [0, n]
+    // return rand() / (RAND_MAX / (n + 1) + 1);
 }
 
 int sample(bitset* bs) {

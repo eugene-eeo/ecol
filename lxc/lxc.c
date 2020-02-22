@@ -135,14 +135,14 @@ int main(int argc, char* argv[]) {
         int* P = allocate_path_array(&g);
 
         graph6_read_graph(line, gs.cursor, gs.size, &g);
+        graph_init(&g);
 
         int class1 = 0;
         int delta = graph_max_degree(&g);
-        int num_uncoloured = bitset_count(&g.uncoloured_edges);
+        int num_uncoloured = bitset_count(&g.uncoloured_edges) / 2;
         bitset S = bitset_new(delta + 2);
         // Only do colouring if graph is underfull
         if (num_uncoloured <= delta * (g.size / 2)) {
-            graph_init(&g);
             bitset uncoloured = bitset_new(g.size * g.size);
             bitset_copy(&uncoloured, &g.uncoloured_edges);
 

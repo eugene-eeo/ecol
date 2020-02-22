@@ -40,8 +40,6 @@ void graph6_read_graph(char* data, int cursor, int size, graph* g) {
             int c = (b & m) ? 0 : -1;
             g->edges[u * size + v] = c;
             g->edges[v * size + u] = c;
-            if (c == 0)
-                g->num_uncoloured++;
             k++;
         }
     }

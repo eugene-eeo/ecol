@@ -5,9 +5,9 @@
 
 typedef struct {
     int size;
-    int num_uncoloured; // number of uncoloured edges
     int *edges; // edge data
     bitset* free;
+    bitset uncoloured_edges;
 } graph;
 
 typedef struct {

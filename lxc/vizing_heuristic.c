@@ -12,15 +12,14 @@
 #include <stdlib.h>
 
 // get a random number in the range of [0,n)
-int randrange(int n) {
+inline int randrange(int n) {
     return rand() / (RAND_MAX / n + 1);
     // [0, n]
     // return rand() / (RAND_MAX / (n + 1) + 1);
 }
 
 int sample(bitset* bs) {
-    int n = bitset_count(bs);
-    return bitset_nthset(bs, randrange(n));
+    return bitset_nthset(bs, bitset_count(bs));
 }
 
 int vizing_heuristic(graph* g, int* P, int delta, bitset* S) {
@@ -40,7 +39,7 @@ int vizing_heuristic(graph* g, int* P, int delta, bitset* S) {
     // S is used throughout code
     bitset_clear(S);
 
-    while (g->num_uncoloured > 0) {
+    while (bitset_any(&g->uncoloured_edges)) {
         if (taboo == 0) {
             edge e = graph_next_uncoloured_edge(g);
             w = e.i;

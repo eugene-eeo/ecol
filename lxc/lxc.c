@@ -39,8 +39,6 @@ graph pt_read_stream(FILE* f) {
         for (int i = 0; i < nbytes; i++) {
             if (line[i] == '1' || line[i] == '0') {
                 g.edges[u * g.size + i] = line[i] == '1' ? 0 : -1;
-                if (line[i] == '1')
-                    g.num_uncoloured++;
             }
         }
         u++;
@@ -48,7 +46,6 @@ graph pt_read_stream(FILE* f) {
             break;
     }
 
-    g.num_uncoloured = g.num_uncoloured / 2;
     return g;
 }
 
@@ -85,20 +82,24 @@ int main(int argc, char* argv[]) {
         }
     }
 
+    // In pt mode we only read and edge-colour one graph
+    // and then return the colours needed and time taken
+    // for one run of the heuristic.
     if (pt) {
         graph g = pt_read_stream(stdin);
         int* P = allocate_path_array(&g);
 
-        int num_uncoloured = g.num_uncoloured;
         int delta = graph_max_degree(&g);
         bitset S = bitset_new(delta + 2);
 
         // do colouring
         graph_init(&g);
         int class = 2;
-        clock_t start, stop;
-        start = 0;
-        stop = 0;
+        clock_t start = 0;
+        clock_t stop = 0;
+
+        bitset uncoloured = bitset_new(g.size * g.size);
+        bitset_copy(&uncoloured, &g.uncoloured_edges);
 
         for (int a = 0; a < attempts; a++) {
             start = clock();
@@ -106,7 +107,7 @@ int main(int argc, char* argv[]) {
             stop = clock();
             if (class == 1)
                 break;
-            g.num_uncoloured = num_uncoloured;
+            bitset_copy(&g.uncoloured_edges, &uncoloured);
             for (int i = 0; i < g.size * g.size; i++) {
                 g.edges[i] = (g.edges[i] >= 0) ? 0 : -1;
             }
@@ -137,16 +138,19 @@ int main(int argc, char* argv[]) {
 
         int class1 = 0;
         int delta = graph_max_degree(&g);
-        int num_uncoloured = g.num_uncoloured;
+        int num_uncoloured = bitset_count(&g.uncoloured_edges);
         bitset S = bitset_new(delta + 2);
         // Only do colouring if graph is underfull
-        if (g.num_uncoloured <= delta * (g.size / 2)) {
+        if (num_uncoloured <= delta * (g.size / 2)) {
             graph_init(&g);
+            bitset uncoloured = bitset_new(g.size * g.size);
+            bitset_copy(&uncoloured, &g.uncoloured_edges);
+
             for (int a = 0; a < attempts; a++) {
                 class1 = vizing_heuristic(&g, P, delta, &S) == 1;
                 if (class1)
                     break;
-                g.num_uncoloured = num_uncoloured;
+                bitset_copy(&g.uncoloured_edges, &uncoloured);
                 for (int i = 0; i < g.size * g.size; i++) {
                     g.edges[i] = g.edges[i] == -1 ? -1 : 0;
                 }

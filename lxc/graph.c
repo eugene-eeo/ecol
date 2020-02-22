@@ -18,9 +18,9 @@ graph graph_create(int n) {
         g.edges[i] = -1;
     }
 
+    g.uncoloured_edges = bitset_new(n * n);
     g.free = NULL;
     g.size = n;
-    g.num_uncoloured = 0;
     return g;
 }
 
@@ -44,14 +44,26 @@ void graph_init(graph* g) {
         // we never use 0 for colouring
         g->free[i] = bitset_new(delta + 2);
     }
+    // Update uncoloured edges bitset
+    int N = g->size * g->size;
+    bitset* ref = &g->uncoloured_edges;
+    for (int i = 0; i < N; i++) {
+        if (g->edges[i] == 0)
+            bitset_set(ref, i, 1);
+    }
 }
 
 // Set edge colour
 void graph_set(graph* g, int u, int v, int colour) {
-    int og = g->edges[(u * g->size) + v];
+    int n = g->size;
+    int og = g->edges[(u * n) + v];
 
-    g->edges[(u * g->size) + v] = colour;
-    g->edges[(v * g->size) + u] = colour;
+    // Position of uv and vu in uncoloured_edges
+    int pos_uv = (u * n) + v;
+    int pos_vu = (v * n) + u;
+
+    g->edges[(u * n) + v] = colour;
+    g->edges[(v * n) + u] = colour;
 
     if (og != 0) {
         if (og != -1) {
@@ -59,7 +71,8 @@ void graph_set(graph* g, int u, int v, int colour) {
             bitset_set(&g->free[v], og, 1);
         }
         if (colour == 0) {
-            g->num_uncoloured++;
+            bitset_set(&g->uncoloured_edges, pos_uv, 1);
+            bitset_set(&g->uncoloured_edges, pos_vu, 1);
         }
     }
 
@@ -67,7 +80,8 @@ void graph_set(graph* g, int u, int v, int colour) {
         bitset_set(&g->free[u], colour, 0);
         bitset_set(&g->free[v], colour, 0);
         if (og == 0) {
-            g->num_uncoloured--;
+            bitset_set(&g->uncoloured_edges, pos_uv, 0);
+            bitset_set(&g->uncoloured_edges, pos_vu, 0);
         }
     }
 }
@@ -94,17 +108,11 @@ int graph_get_degree(graph* g, int u) {
 // Find the next uncoloured edge
 edge graph_next_uncoloured_edge(graph* g) {
     edge e = {-1, -1};
-    int n = g->size;
-    int* edges = g->edges;
-    for (int i = 0; i < n; i++) {
-        int m = i * n;
-        for (int j = i + 1; j < n; j++) {
-            if (edges[m + j] == 0) {
-                e.i = i;
-                e.j = j;
-                return e;
-            }
-        }
+    int pos = bitset_first(&g->uncoloured_edges);
+    if (pos != -1) {
+        // unravel pos to get u, v
+        e.i = pos / g->size;
+        e.j = pos % g->size;
     }
     return e;
 }

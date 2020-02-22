@@ -46,10 +46,10 @@ void graph_init(graph* g) {
     }
     // Update uncoloured edges bitset
     int N = g->size * g->size;
-    bitset* ref = &g->uncoloured_edges;
+    bitset* ue = &g->uncoloured_edges;
     for (int i = 0; i < N; i++) {
         if (g->edges[i] == 0)
-            bitset_set(ref, i, 1);
+            bitset_set(ue, i, 1);
     }
 }
 

@@ -34,7 +34,7 @@ graph pt_read_stream(FILE* f) {
 
     while ((nbytes = getline(&line, &size, f)) > 0) {
         if (u == 0) {
-            g = graph_create(nbytes);
+            g = graph_create(nbytes - 1);
         }
         for (int i = 0; i < nbytes; i++) {
             if (line[i] == '1' || line[i] == '0') {

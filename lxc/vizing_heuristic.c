@@ -19,7 +19,7 @@ inline int randrange(int n) {
 }
 
 int sample(bitset* bs) {
-    return bitset_nthset(bs, bitset_count(bs));
+    return bitset_nthset(bs, randrange(bitset_count(bs)));
 }
 
 int vizing_heuristic(graph* g, int* P, int delta, bitset* S) {

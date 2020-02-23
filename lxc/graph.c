@@ -27,6 +27,7 @@ graph graph_create(int n) {
 // Destroy graph
 void graph_free(graph* g) {
     free(g->edges);
+    bitset_free(&g->uncoloured_edges);
     if (g->free != NULL) {
         for (int i = 0; i < g->size; i++) {
             bitset_free(&g->free[i]);

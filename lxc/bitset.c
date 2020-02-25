@@ -129,8 +129,8 @@ int bitset_nthset(bitset* bs, int n) {
     for (int i = 0; i < bs->len; i++) {
         bs_tiny b = bs->B[i];
         int count = bst_count(b);
-        if (count + run >= n) {
-            return bst_nthset(b, n - run);
+        if (count + run > n) {
+            return 64*i + bst_nthset(b, n - run);
         }
         run += count;
     }

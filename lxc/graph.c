@@ -174,15 +174,16 @@ void switch_path(graph* g, int* path, int length, int alpha, int beta) {
 }
 
 int verify_colouring(graph *g) {
-    for (int i = 0; i < g->size; i++) {
-        for (int j = i+1; j < g->size; j++) {
+    int n = g->size;
+    for (int i = 0; i < n; i++) {
+        for (int j = i+1; j < n; j++) {
             // Check if (i, j) exists
             int c1 = graph_get(g, i, j);
             if (c1 == -1) continue;
-            int k = i;
-            for (int l = j+1; l < g->size; l++) {
-                // we always return correct decision even if (k, l) == -1
-                if (graph_get(g, k, l) == c1)
+            if (c1 == 0)  return 0; // invalid colour
+            for (int l = j+1; l < n; l++) {
+                // we always return correct decision even if (i, l) == -1
+                if (graph_get(g, i, l) == c1)
                     return 0;
             }
         }

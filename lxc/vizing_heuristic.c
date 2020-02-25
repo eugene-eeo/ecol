@@ -12,7 +12,7 @@
 #include <stdlib.h>
 
 // get a random number in the range of [0,n)
-inline int randrange(int n) {
+int randrange(int n) {
     return rand() / (RAND_MAX / n + 1);
     // [0, n]
     // return rand() / (RAND_MAX / (n + 1) + 1);

@@ -1,6 +1,7 @@
 all:
 	cd ecol; go build
 	cd xc; make
+	cd lxc; make
 
 deploy:
 	mkdir -p hamilton

@@ -173,11 +173,12 @@ def dmacs2graph(stream):
     for line in stream:
         line = line.strip()
         if line.startswith('p'):
-            _, format, nodes, _ = line.split()
-            assert format.lower().startswith('edge')
+            _, _, nodes, _ = line.split()
             n = int(nodes)
             g = Graph(n)
-        elif line.startswith('e'):
+            break
+    for line in stream:
+        if line.startswith('e'):
             _, u, v = line.split()
             g[int(u)-1, int(v)-1] = 0
     return g

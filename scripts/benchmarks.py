@@ -1,3 +1,4 @@
+import time
 from os import listdir
 from tabulate import tabulate
 
@@ -8,26 +9,55 @@ from pyecol.utils import ColouringGraph, validate_colouring, colours_used, \
     max_degree, dmacs2graph
 
 
+benches = [
+    "myciel3.col",
+    "myciel4.col",
+    "myciel5.col",
+    "myciel6.col",
+    "myciel7.col",
+    "le450_5a.col",
+    "le450_5b.col",
+    "le450_5c.col",
+    "le450_5d.col",
+    "le450_15a.col",
+    "le450_15b.col",
+    "le450_15c.col",
+    "le450_15d.col",
+    "le450_25a.col",
+    "le450_25b.col",
+    "le450_25c.col",
+    "le450_25d.col",
+]
+
+
 def benchmark():
     data = []
     for item in listdir("cols"):
-        if item.endswith(".col"):
+        if item.endswith(".col") and item in benches:
+            print(item)
             name = item[:-4]
             G = dmacs2graph(open(f"cols/{item}"))
-            g = ColouringGraph.copy(G)
 
-            vizing_heuristic(g)
-            assert validate_colouring(g)
+            total_vh = 0
+            total_cb = 0
 
-            h = ColouringGraph.copy(G)
+            for _ in range(50):
+                g = ColouringGraph.copy(G)
+                start = time.monotonic()
+                vizing_heuristic(g)
+                end = time.monotonic()
+                total_vh += end - start
 
-            misra_gries(h)
-            assert validate_colouring(h)
+            for _ in range(1):
+                h = ColouringGraph.copy(G)
+                misra_gries(h)
 
-            h2 = ColouringGraph.copy(G)
-
-            counting_colour(h2)
-            assert validate_colouring(h2)
+            for _ in range(50):
+                h2 = ColouringGraph.copy(G)
+                start = time.monotonic()
+                counting_colour(h2)
+                end = time.monotonic()
+                total_cb += end - start
 
             data.append((
                 name,
@@ -35,9 +65,11 @@ def benchmark():
                 colours_used(g),
                 colours_used(h),
                 colours_used(h2),
+                total_cb / total_vh,
             ))
+            print(data[-1])
     data.sort()
-    print(tabulate(data, headers=["Instance", "Δ", "ΔVh", "MG", "CB"]))
+    print(tabulate(data, headers=["Instance", "Δ", "ΔVh", "MG", "CB", "CB slowdown"]))
 
 
 if __name__ == '__main__':

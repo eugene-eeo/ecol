@@ -36,7 +36,7 @@ def construct(n):
 
 
 def main():
-    for n in range(4, 4 + 2, 2):
+    for n in range(4, 10 + 2, 2):
         print(n, file=sys.stderr)
         print(json.dumps({
             "n": n,

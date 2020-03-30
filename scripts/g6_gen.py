@@ -72,10 +72,15 @@ def gen_graph(n, delta):
 
 
 if __name__ == '__main__':
-    start = int(sys.argv[1])
-    end   = int(sys.argv[2])
+    try:
+        start = int(sys.argv[1])
+        end = int(sys.argv[2])
+        delta = int(sys.argv[3])
+    except IndexError:
+        print(f"usage: {sys.argv[0]} <start> <end> <delta>")
+        exit(1)
 
     for n in range(start, end):
         print(f"n={n}", file=sys.stderr)
-        for g in gen_graph(n, 5):
+        for g in gen_graph(n, delta):
             print(graph_to_g6(g))

@@ -68,14 +68,14 @@ void graph6_write_bytes(graph g, int n, char* buf) {
         buf[0] = n;
     } else if (n <= 258047) {
         N = 4;
-        buf[0] = 126;
+        buf[0] = 126 - 63;
         buf[1] = (n >> 12) & 63;
         buf[2] = (n >> 6) & 63;
         buf[3] = n & 63;
     } else {
         N = 8;
-        buf[0] = 126;
-        buf[1] = 126;
+        buf[0] = 126 - 63;
+        buf[1] = 126 - 63;
         buf[2] = (n >> 30) & 63;
         buf[3] = (n >> 24) & 63;
         buf[4] = (n >> 18) & 63;

@@ -83,3 +83,12 @@
 | queen16_16      |   256 |    6320 |  59 |   59 |   0    |
 | wap04a          |  5231 |  294902 | 351 |  351 |  63.78 |
 | will199GPIA     |   701 |    6772 |  38 |   38 |   0.02 |
+
+## `S(m,n,p)` results
+
+ - `n <= m`  - Class2 if m is odd, Class 1 if m is even.
+ - `n = m+1` - Class 2 prob decreases with p if m is odd, else increases with p
+ - `n > m+1` -
+   - if `m` is even, then increases up to certain point before decreasing
+   - if `m` is odd, then decreases monotonically (except for case where `n=m+2`)
+   - in general, as `n` increases, probability of Class 2 decreases

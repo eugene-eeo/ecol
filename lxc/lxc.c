@@ -101,10 +101,18 @@ int main(int argc, char* argv[]) {
         bitset uncoloured = bitset_new(g.size * g.size);
         bitset_copy(&uncoloured, &g.uncoloured_edges);
 
+        double total = 0;
+        double num = 0;
+
         for (int a = 0; a < attempts; a++) {
+            num += 1;
             start = clock();
             class = vizing_heuristic(&g, P, delta, &S);
             stop = clock();
+            total += (double)(stop - start) / CLOCKS_PER_SEC;
+            /* fprintf(stderr, "%d,%f\n", a, (double)(stop - start) / CLOCKS_PER_SEC); */
+            /* if (class == 1 && !verify_colouring(&g)) */
+            /*     printf("wtf!\n"); */
             if (class == 1)
                 break;
             bitset_copy(&g.uncoloured_edges, &uncoloured);
@@ -113,7 +121,9 @@ int main(int argc, char* argv[]) {
             }
         }
 
-        printf("%d,%.2f\n", (class == 1) ? delta : delta + 1, (double)(stop - start) / CLOCKS_PER_SEC);
+        printf("%d,%.2f\n",
+               (class == 1) ? delta : delta + 1, // colours needed
+               num > 0 ? total / num : 0);       // average time
 
         bitset_free(&S);
         free(P);

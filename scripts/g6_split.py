@@ -66,21 +66,27 @@ def gen_split_graph(m, n, p):
     for i in range(n):
         for j in range(m):
             if random.random() <= p:
-                g.add_edge(j, i)
+                g.add_edge(j, m+i)
 
     return g
 
 
+P = [x/100 for x in range(0, 101)]
+#P = [0, 0.125, 0.25, 0.5, 0.75, 0.95, 1.0]
+
+
 def main():
-    for m in range(5, 15, 2):
-        for n in range(m + 1, m + 1 + 1):
-            for p in [0, 0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0.11, 0.12, 0.13, 0.14, 0.15, 0.17, 0.19, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1.0]:
+    for m in [8]:
+        # for n in range(m + 2, m + 2 + 1):
+        for n in [1, 2, 3, 4, 5, 6, 7]:
+            # for p in [0, 0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0.11, 0.12, 0.13, 0.14, 0.15, 0.17, 0.19, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 0.96, 0.97, 0.98, 0.99, 0.991, 0.992, 0.993, 0.994, 0.995, 0.996, 0.997, 0.998, 0.999, 1.0]:
+            for p in P:
                 lines = []
-                repeats = 10000
+                repeats = 500
                 for _ in range(repeats):
                     lines.append(graph_to_g6(gen_split_graph(m, n, p)).encode('ascii'))
                 proc = subprocess.Popen(
-                    ["lxc/lxc", "-a", str(1000)],
+                    ["lxc/lxc", "-a", str(5000)],
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE,
                     stdin=subprocess.PIPE,

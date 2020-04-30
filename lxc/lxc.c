@@ -110,14 +110,14 @@ int main(int argc, char* argv[]) {
             class = vizing_heuristic(&g, P, delta, &S);
             stop = clock();
             total += (double)(stop - start) / CLOCKS_PER_SEC;
-            /* fprintf(stderr, "%d,%f\n", a, (double)(stop - start) / CLOCKS_PER_SEC); */
+            fprintf(stderr, "%d,%f\n", a, (double)(stop - start) / CLOCKS_PER_SEC);
             /* if (class == 1 && !verify_colouring(&g)) */
             /*     printf("wtf!\n"); */
             if (class == 1)
                 break;
             bitset_copy(&g.uncoloured_edges, &uncoloured);
             for (int i = 0; i < g.size * g.size; i++) {
-                g.edges[i] = (g.edges[i] >= 0) ? 0 : -1;
+                g.edges[i] = (g.edges[i] != -1) ? 0 : -1;
             }
         }
 

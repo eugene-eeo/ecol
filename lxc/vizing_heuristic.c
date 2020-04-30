@@ -41,6 +41,9 @@ int vizing_heuristic(graph* g, int* P, int delta, bitset* S) {
 
     while (bitset_any(&g->uncoloured_edges)) {
         if (taboo == 0) {
+            /* int pos = sample(&g->uncoloured_edges); */
+            /* w   = pos / g->size; */
+            /* v_0 = pos % g->size; */
             edge e = graph_next_uncoloured_edge(g);
             w = e.i;
             v_0 = e.j;

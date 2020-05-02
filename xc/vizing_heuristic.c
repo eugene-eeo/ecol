@@ -12,6 +12,18 @@
 #include "bitset.h"
 #include "graph.h"
 #include "vizing_heuristic.h"
+#include <stdlib.h>
+
+// get a random number in the range of [0,n)
+int randrange(int n) {
+    return rand() / (RAND_MAX / n + 1);
+    // [0, n]
+    // return rand() / (RAND_MAX / (n + 1) + 1);
+}
+
+int sample(bitset bs) {
+    return bitset_nthset(bs, randrange(bitset_count(bs)));
+}
 
 int vizing_heuristic(graph* g, int* P, int delta) {
     // Set available colours to delta
@@ -35,7 +47,7 @@ int vizing_heuristic(graph* g, int* P, int delta) {
         // Clear
         bitset S = bitset_intersection(g->free[w], g->free[v_0]);
         if (S) {
-            int colour = bitset_first(S);
+            int colour = sample(S);
             graph_set(g, w, v_0, colour);
             taboo = 0;
         } else {
@@ -49,9 +61,9 @@ int vizing_heuristic(graph* g, int* P, int delta) {
                 /* taboo = 0; */
                 return 2;
             } else {
-                int alpha = bitset_first(S);
+                int alpha = sample(S);
                 if (taboo == 0) {
-                    beta = bitset_first(g->free[w]);
+                    beta = sample(g->free[w]);
                 }
                 int len = get_path(g, v_0, beta, alpha, P);
                 if (P[len-1] != w) {

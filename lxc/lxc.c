@@ -46,15 +46,18 @@ graph pt_read_stream(FILE* f) {
             break;
     }
 
+    free(line);
     return g;
 }
 
 static const char* help =
-    "usage: lxc [-a#] [-p] [-h]\n"
+    "usage: lxc [-a#] [-p] [-h] [-e] [-f]\n"
     "\n"
     "options:\n"
     "    -a# number of attempts (default: 15)\n"
     "    -p  plaintext format (default graph6)\n"
+    "    -e  print out a matrix of edge colours (only makes sense with -p)\n"
+    "    -f  compute full colouring (no short circuiting)\n"
     "    -h  help message\n";
 
 int showhelp(int code) {
@@ -67,8 +70,10 @@ int main(int argc, char* argv[]) {
     int opt;
     int pt = 0;
     int attempts = 15;
+    int output_edge_colouring = 0;
+    int full_colouring = 0;
 
-    while ((opt = getopt(argc, argv, "ha:p")) != -1) {
+    while ((opt = getopt(argc, argv, "ha:pef")) != -1) {
         switch (opt) {
             case 'h':
                 showhelp(0);
@@ -79,6 +84,12 @@ int main(int argc, char* argv[]) {
             case 'p':
                 pt = 1;
                 break;
+            case 'e':
+                output_edge_colouring = 1;
+                break;
+            case 'f':
+                full_colouring = 1;
+                break;
         }
     }
 
@@ -87,6 +98,8 @@ int main(int argc, char* argv[]) {
     // for one run of the heuristic.
     if (pt) {
         graph g = pt_read_stream(stdin);
+        if (g.size == 0)
+            return 0;
         int* P = allocate_path_array(&g);
 
         int delta = graph_max_degree(&g);
@@ -107,23 +120,37 @@ int main(int argc, char* argv[]) {
         for (int a = 0; a < attempts; a++) {
             num += 1;
             start = clock();
-            class = vizing_heuristic(&g, P, delta, &S);
+            class = vizing_heuristic(&g, P, delta, &S, output_edge_colouring || full_colouring);
             stop = clock();
             total += (double)(stop - start) / CLOCKS_PER_SEC;
-            fprintf(stderr, "%d,%f\n", a, (double)(stop - start) / CLOCKS_PER_SEC);
             /* if (class == 1 && !verify_colouring(&g)) */
             /*     printf("wtf!\n"); */
             if (class == 1)
                 break;
-            bitset_copy(&g.uncoloured_edges, &uncoloured);
-            for (int i = 0; i < g.size * g.size; i++) {
-                g.edges[i] = (g.edges[i] != -1) ? 0 : -1;
+            // do not clear the graph if we are on the last attempt
+            if (a < attempts - 1) {
+                bitset_copy(&g.uncoloured_edges, &uncoloured);
+                for (int i = 0; i < g.size * g.size; i++) {
+                    g.edges[i] = (g.edges[i] != -1) ? 0 : -1;
+                }
             }
         }
 
-        printf("%d,%.2f\n",
-               (class == 1) ? delta : delta + 1, // colours needed
-               num > 0 ? total / num : 0);       // average time
+        double avg_time = num > 0 ? total / num : 0;
+
+        if (output_edge_colouring) {
+            // Output the edge colouring as a matrix
+            for (int u = 0; u < g.size; u++) {
+                for (int v = 0; v < g.size; v++) {
+                    printf("%d,", graph_get(&g, u, v));
+                }
+                printf("\n");
+            }
+        } else {
+            printf("%d,%.2f\n",
+                   (class == 1) ? delta : delta + 1, // colours needed
+                   avg_time);       // average time
+        }
 
         bitset_free(&S);
         free(P);
@@ -157,7 +184,7 @@ int main(int argc, char* argv[]) {
             bitset_copy(&uncoloured, &g.uncoloured_edges);
 
             for (int a = 0; a < attempts; a++) {
-                class1 = vizing_heuristic(&g, P, delta, &S) == 1;
+                class1 = vizing_heuristic(&g, P, delta, &S, 0) == 1;
                 if (class1)
                     break;
                 bitset_copy(&g.uncoloured_edges, &uncoloured);

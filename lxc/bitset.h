@@ -11,6 +11,9 @@ typedef struct {
     bs_tiny* B;
 } bitset;
 
+int bst_count(bs_tiny a);
+int bst_nthset(bs_tiny a, int n);
+
 bitset bitset_new(int size);
 void bitset_free(bitset* bs);
 void bitset_set(bitset* bs, int pos, int val);

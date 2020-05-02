@@ -18,6 +18,20 @@ int randrange(int n) {
     // return rand() / (RAND_MAX / (n + 1) + 1);
 }
 
+int bitset_nthset_with_index(bitset* bs, int n, int* idx) {
+    int run = 0;
+    for (int i = 0; i < bs->len; i++) {
+        bs_tiny b = bs->B[i];
+        int count = bst_count(b);
+        if (count + run > n) {
+            *idx = i;
+            return 64*i + bst_nthset(b, n - run);
+        }
+        run += count;
+    }
+    return -1;
+}
+
 int sample(bitset* bs) {
     return bitset_nthset(bs, randrange(bitset_count(bs)));
 }
@@ -27,20 +41,24 @@ int sample_bst(bitset* bs, int *idx) {
     int n = bs->len;
     bs_tiny* B = bs->B;
     // sample from different region
-    if (rand() <= 0.125 || bst_count(B[u]) == 0) {
+    if (rand() <= 0.0625 || bst_count(B[u]) == 0) {
         // sample at most 100 places; otherwise fallback to
         // locality-insensitive sample.
         int ok = 0;
-        for (int i = 0; i < 100 && !ok; i++) {
-            u = randrange(n);
-            ok = bst_count(B[u]) > 0;
+        int k = randrange(n);
+        for (int i = 0; i < 100; i++) {
+            u = (u + i*k) % n;
+            if (bst_count(B[u]) > 0) {
+                *idx = u;
+                ok = 1;
+                break;
+            }
         }
         if (!ok) {
-            return sample(bs);
+            return bitset_nthset_with_index(bs, randrange(bitset_count(bs)), idx);
         }
-        *idx = u;
     }
-    bs_tiny b = bs->B[u];
+    bs_tiny b = B[u];
     return (64*u) + bst_nthset(b, randrange(bst_count(b)));
 }
 
@@ -66,8 +84,10 @@ int vizing_heuristic(graph* g, int* P, int delta, bitset* S, int full) {
     while (bitset_any(&g->uncoloured_edges)) {
         if (taboo == 0) {
             int pos = sample_bst(&g->uncoloured_edges, &idx);
+            /* int pos = sample(&g->uncoloured_edges); */
             w   = pos / g->size;
             v_0 = pos % g->size;
+            /* printf("(%d,%d,%d)\n", w, v_0, graph_get(g, w, v_0)); */
         }
 
         // S = Free[w] ^ Free[v_0]

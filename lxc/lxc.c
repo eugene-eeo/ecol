@@ -123,7 +123,7 @@ int main(int argc, char* argv[]) {
             class = vizing_heuristic(&g, P, delta, &S, output_edge_colouring || full_colouring);
             stop = clock();
             total += (double)(stop - start) / CLOCKS_PER_SEC;
-            /* if (class == 1 && !verify_colouring(&g)) */
+            /* if ((full_colouring || output_edge_colouring || class == 1) && !verify_colouring(&g)) */
             /*     printf("wtf!\n"); */
             if (class == 1)
                 break;

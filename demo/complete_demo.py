@@ -18,6 +18,7 @@ print("MG:", colours_used(h3))
 
 
 print("LXC:")
-for i in range(1, 40, 4):
+for i in range(1, 10, 1):
     colours = colours_used(lxc(g, attempts=i))
-    print("  ", i, colours, "(Class 1)" if colours == max_degree(g) else "(Class 2)")
+    _class = 1 if colours == max_degree(g) else 2
+    print("  ", i, colours, f"(Class {_class})")

@@ -8,7 +8,8 @@ render(lxc(g), "Bipartite 2, 5")
 print("Δ   colours used")
 for i in range(10, 850, 50):
     g = gen_bipartite_graph(i, i)
+    h = lxc(g)
     print("{:<3} {}".format(
         max_degree(g),
-        colours_used(lxc(g)),
+        colours_used(h),
     ))

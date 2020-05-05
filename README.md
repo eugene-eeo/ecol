@@ -1,3 +1,25 @@
+# Edge Colouring
+
+| folder   | description                                             |
+|:---------|:------------------------------------------------------- |
+| `pyecol` | python implementation of heuristics + some utilities    |
+| `ecol`   | go implementation of CB/VH heuristics + graph checking  |
+| `xc`     | VH + many utilities implemented in C                    |
+| `lxc`    | VH implementation for arbitrary graphs                  |
+
+## Prerequisites
+
+Need to download [nauty](http://users.cecs.anu.edu.au/~bdm/nauty/).
+
+    $ pip install --editable .
+    $ pip install -r requirements.txt
+
+
+## Building
+
+    $ make
+
+
 ## Benchmark instances
 
     Instance      Δ    ΔVh    MG    CB
@@ -20,7 +42,7 @@
     myciel6      47     47    47    47
     myciel7      95     95    95    95
 
-# Bad cores
+## Bad cores
 
  - `nP1 * C(n+1)` (for all n >= 3), hard to identify common substructure.
  - **`K_n`** (even n, n >= 4) is always bad core -- found an edge-critical and vertex-critical (minimal) extension.
@@ -31,7 +53,7 @@
    - `n=9`: `1, (n)^2, (n+1)^2, (n+2)^9`
    - `n=m`: `1, (n)^2, (n+1)^2, (n+2)^n` (?) Conjecture.
 
-# HZ
+## HZ
 
  - `Δ=4`, K5-e == 2P1 * C3
  - `Δ=5`, 3P1 * C4
@@ -83,8 +105,3 @@
 | queen16_16      |   256 |    6320 |  59 |   59 |   0    |
 | wap04a          |  5231 |  294902 | 351 |  351 |   0.75 |
 | will199GPIA     |   701 |    6772 |  38 |   38 |   0.00 |
-
-## `S(m,n,p)` results
-
- - `S(m,1,p)` - Odd `m`, Class 2 prob tends to 0 as `p -> 1`,
-   even `m`, class 2 prob tends to 1 as `p -> 1`.

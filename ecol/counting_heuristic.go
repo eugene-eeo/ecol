@@ -25,7 +25,7 @@ func counting_heuristic_colour(G *ColouringGraph) {
 	F := bitset.New(uint(G.g.n)) // Used to compute F(u) \ C
 	N := 0
 	var f_u *bitset.BitSet = nil
-	var r []int = nil
+	var r []int
 
 	F_u := make(map[int]*FreesetInfo, G.g.n)
 	// Use this to populate F_u to avoid reallocs

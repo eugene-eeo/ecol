@@ -33,7 +33,7 @@ func (gc *GraphCheckMetadata) Alloc() {
 	gc.Core = bitset.New(uint(gc.G.n))
 	gc.Degree = make([]int, gc.G.n)
 	gc.AdjList = make([]*bitset.BitSet, gc.G.n)
-	for i, _ := range gc.AdjList {
+	for i := range gc.AdjList {
 		gc.AdjList[i] = bitset.New(uint(gc.G.n))
 	}
 }
